@@ -1,40 +1,39 @@
 # Quick Checker (quick-checker-app)
 
-A Quasar project for Quick Checker aApp
+A Quasar project for Quick Checker App
 
-## Install the dependencies
+## Prerequisites
+
+Make sure you have `node.js` v20 or later running in your machine. Check Quasar's page for more info [https://quasar.dev/start/quick-start](https://quasar.dev/start/quick-start)
+
+## Setup
+
 ```bash
-yarn
-# or
+# install Quasar CLI globally (optional)
+npm i -g @quasar/cli
+
+# clone the project
+git clone https://github.com/amiano4/quick-checker-app.git
+
+# open project folder
+cd quick-checker-app
+```
+
+### Install the dependencies
+
+```bash
 npm install
 ```
 
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
+### Create `.env.local` file in the project root directory, then write
+
+```bash
+# change to your quick-checker-api host endpoint
+VITE_API=http://localhost:8000
+```
+
+### Start the app in development mode for web (for testing/debugging)
+
 ```bash
 quasar dev
 ```
-
-
-### Lint the files
-```bash
-yarn lint
-# or
-npm run lint
-```
-
-
-### Format the files
-```bash
-yarn format
-# or
-npm run format
-```
-
-
-### Build the app for production
-```bash
-quasar build
-```
-
-### Customize the configuration
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
