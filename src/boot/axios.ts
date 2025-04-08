@@ -1,5 +1,6 @@
 import { defineBoot } from '#q-app/wrappers';
 import axios, { type AxiosInstance } from 'axios';
+import { useAuthStore } from 'src/stores/auth-store';
 
 declare module 'vue' {
   interface ComponentCustomProperties {
@@ -14,10 +15,13 @@ declare module 'vue' {
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const api = axios.create({ baseURL: 'https://api.example.com' });
+const api = axios.create({ baseURL: (import.meta.env.VITE_API ?? 'http://localhost') + '/api' });
 
 export default defineBoot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
+
+  api.defaults.withCredentials = true;
+  api.defaults.withXSRFToken = true;
 
   app.config.globalProperties.$axios = axios;
   // ^ ^ ^ this will allow you to use this.$axios (for Vue Options API form)
@@ -26,6 +30,23 @@ export default defineBoot(({ app }) => {
   app.config.globalProperties.$api = api;
   // ^ ^ ^ this will allow you to use this.$api (for Vue Options API form)
   //       so you can easily perform requests against your app's API
+
+  api.interceptors.request.use(
+    (config) => {
+      const authStore = useAuthStore();
+
+      // sanctum authentication (SPA)
+      if (authStore.getToken) {
+        config.headers.Authorization = `Bearer ${authStore.getToken}`;
+      }
+
+      return config;
+    },
+    (error) => {
+      // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+      return Promise.reject(error);
+    },
+  );
 });
 
 export { api };
