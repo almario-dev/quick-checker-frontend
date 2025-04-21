@@ -59,7 +59,8 @@ export default defineRouter(function (/* { store, ssrContext } */) {
 
       next();
     } catch (err) {
-      next('/404');
+      // next({ name: 'Error' });
+      next();
       console.error(err);
     }
   });

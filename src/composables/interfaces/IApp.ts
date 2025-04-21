@@ -1,0 +1,9 @@
+export interface AlertDialogConfig {
+  title?: string;
+  message: string;
+  type?: 'info' | 'success' | 'warning' | 'error';
+  after?: number;
+  onOk?: () => void;
+  onCancel?: () => void;
+  onDismiss?: () => void;
+}

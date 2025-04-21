@@ -5,6 +5,8 @@ import type { AuthToken, UserData } from 'src/composables/types/auth';
 import { computed, ref } from 'vue';
 import { useUserStore } from './user-store';
 import type { AxiosResponse } from 'axios';
+import { showAlertDialog } from 'src/composables/usePlugins';
+import { useRouter } from 'vue-router';
 
 export const useAuthStore = defineStore(
   'auth',
@@ -14,6 +16,7 @@ export const useAuthStore = defineStore(
     const getToken = computed(() => token.value);
 
     const userStore = useUserStore();
+    const router = useRouter();
 
     const setToken = (newToken: AuthToken): void => {
       token.value = newToken;
@@ -89,6 +92,18 @@ export const useAuthStore = defineStore(
             resolve(userStore.getData);
           })
           .catch((err) => {
+            showAlertDialog({
+              title: 'Session expired',
+              message: 'Please log in again',
+              type: 'error',
+              onDismiss: () => {
+                setToken(null);
+                router.push({ name: 'Login' }).catch(() => {
+                  // ignore error
+                });
+              },
+            });
+
             // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
             reject(err);
           });
