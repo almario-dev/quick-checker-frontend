@@ -1,7 +1,11 @@
 <template>
   <q-page class="flex column items-center justify-center">
     <q-form class="q-gutter-y-sm" autofocus @submit.prevent="submit">
-      <div class="text-h6">Login</div>
+      <div class="text-h6">
+        Login
+
+        <AppLogo size="md" />
+      </div>
       <q-input
         v-model="form.email"
         label="Email Address"
@@ -37,6 +41,7 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar';
+import AppLogo from 'src/components/AppLogo.vue';
 import type { IUserLogin } from 'src/composables/interfaces/IUser';
 import { createRules } from 'src/composables/useRules';
 import { useAuthStore } from 'src/stores/auth-store';
