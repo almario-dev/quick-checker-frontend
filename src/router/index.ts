@@ -8,6 +8,8 @@ import {
 import routes from './routes';
 import { useAuthStore } from 'src/stores/auth-store';
 import { useUserStore } from 'src/stores/user-store';
+import type { AxiosError } from 'axios';
+import { showAlertDialog } from 'src/composables/usePlugins';
 
 /*
  * If not building with SSR mode, you can
@@ -47,7 +49,6 @@ export default defineRouter(function (/* { store, ssrContext } */) {
         await authStore.refresh();
       }
 
-      // accessing auth pages but not signed in
       if (!userStore.isAuthenticated && to.meta.requireAuth) {
         return next({ name: 'Guest' });
       }
@@ -59,9 +60,17 @@ export default defineRouter(function (/* { store, ssrContext } */) {
 
       next();
     } catch (err) {
-      // next({ name: 'Error' });
-      next();
-      console.error(err);
+      if ((err as AxiosError).response?.status === 401) {
+        showAlertDialog({
+          title: 'Session expired',
+          message: 'Please log in again',
+          type: 'error',
+        });
+
+        return next({ name: 'Login' });
+      } else {
+        return next({ name: 'Error' });
+      }
     }
   });
 
