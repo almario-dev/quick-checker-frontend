@@ -5,21 +5,68 @@
 
 // Check documentation for full list of Quasar variables
 
-// Your own variables (that are declared here) and Quasar's own
-// ones will be available out of the box in your .vue/.scss/.sass files
+// Primary Colors
+$dark-slate-blue: #2c3e50; // Deep, modern tone for professionalism
+$soft-white: #f5f5f5; // Clean background for readability
+$light-gray: #bdc3c7; // Secondary neutral color for less important areas
 
-// It's highly recommended to change the default colors
-// to match your app's branding.
-// Tip: Use the "Theme Builder" on Quasar's documentation website.
+// Accent Colors
+$bright-cyan: #00b8d9; // Interactive elements (buttons, AI check indicator)
+$vivid-green: #27ae60; // Success and correct answers (AI result)
+$amber: #f39c12; // Warnings or incomplete checks
 
-$primary   : #1976D2;
-$secondary : #26A69A;
-$accent    : #9C27B0;
+// Highlight Colors
+$deep-purple: #8e44ad; // Headings, subheadings, and logo accents
 
-$dark      : #1D1D1D;
-$dark-page : #121212;
+// Dark Mode Colors
+$dark-background: #2c3e50; // Background for dark mode
+$dark-text: #f5f5f5; // Text color for dark mode
+$dark-accent: #00b8d9; // Accent for dark mode
+$dark-button: #1a242f; // Buttons in dark mode
 
-$positive  : #21BA45;
-$negative  : #C10015;
-$info      : #31CCEC;
-$warning   : #F2C037;
+// Light Mode Colors
+$light-background: #f5f5f5; // Light background for light mode
+$light-text: #2c3e50; // Text color for light mode
+$light-button: #00b8d9; // Buttons in light mode
+
+// Error and Alert Colors
+$error-red: #e74c3c; // Error indicator (wrong answer)
+$warning-yellow: #f39c12; // Warning indicator (uncertain answer)
+
+// Core Theme Colors
+$primary: #2f4f4f; // Dark Slate Blue - A more neutral, dark bluish color (could be used for headers or primary elements)
+$secondary: #26a69a; // Teal - A fresh, vibrant secondary color (could be used for buttons, secondary elements)
+$accent: #00b8d4; // Bright Cyan - A vibrant accent color (perfect for highlights or active items)
+
+// Dark Mode
+$dark: #1d1d1d; // Dark Background - Perfect for background in dark mode
+$dark-page: #121212; // Slightly darker page background - Used for sections or containers that need more contrast
+
+// Status Colors
+$positive: #21ba45; // Green - Success state, could be used for correct answers or positive actions
+$negative: #c10015; // Red - Error or failure state, ideal for wrong answers or critical errors
+$info: #31ccec; // Cyan - Information or processing state, ideal for showing status updates or alerts
+$warning: #f2c037; // Yellow - Warning state, can be used for uncertain or cautionary states
+
+// Combining both sets into one unified theme
+$primary: $dark-slate-blue; // Primary color, consistent with your theme
+$secondary: $bright-cyan; // Use bright cyan for a fresh secondary color
+$accent: $vivid-green; // Accent color reflecting success or correct results
+$background: $light-background; // Background for light mode, default
+$text: $light-text; // Default text color for light mode
+$button: $light-button; // Button color for light mode
+$error: $error-red; // Red for error alerts (wrong answers)
+$warning: $warning-yellow; // Yellow for warning states
+$success: $vivid-green; // Success color for correct answers or positive outcomes
+$info: $bright-cyan; // Info color for informational feedback
+
+// Dark Mode Specific
+$dark-background: $dark-background; // Dark background for dark mode
+$dark-text: $dark-text; // Text color for dark mode
+$dark-accent: $dark-accent; // Accent color for dark mode
+$dark-button: $dark-button; // Button color for dark mode
+$dark-warning: $warning-yellow; // Maintain yellow for warning alerts in dark mode
+$dark-error: $error-red; // Red error for dark mode
+$dark-success: $vivid-green; // Green success color in dark mode
+
+$shadow-color: #999999; // Shadow color for elements

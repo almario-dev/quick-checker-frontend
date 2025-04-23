@@ -1,47 +1,60 @@
 <template>
-  <q-layout view="lHh lpR fFf">
+  <q-layout view="lHh LpR fFf" class="text-blue-grey-10 layout-with-bg">
+    <div class="animated-bg"></div>
+
+    <q-header v-if="!isScanning" reveal :reveal-offset="1" class="bg-transparent">
+      <q-toolbar class="flex items-center">
+        <Title title="History" class="grow" />
+        <q-btn icon="more_vert" text-color="grey-8" round flat class="q-ml-auto" />
+      </q-toolbar>
+    </q-header>
+
     <q-page-container>
-      <q-page class="flex column">
-        <div>
-          <router-view />
-        </div>
-        <q-tabs
-          v-model="tab"
-          dense
-          class="bg-white shadow-2 rounded-borders"
-          align="center"
-          indicator-color="primary"
-          bottom
-        >
-          <q-tab name="home" icon="home" label="Home" />
-          <q-tab name="profile" icon="person" label="Profile" />
-          <q-tab name="settings" icon="settings" label="Settings" />
-        </q-tabs>
-      </q-page>
+      <q-pull-to-refresh @refresh="refresh">
+        <router-view />
+      </q-pull-to-refresh>
     </q-page-container>
+
+    <q-footer v-if="!isScanning" class="bg-white text-dark">
+      <div class="grid grid-rows-1 grid-cols-4 bottom-nav">
+        <div class="col-span-3">
+          <q-tabs class="bg-primary text-white" indicator-color="transparent" align="justify">
+            <q-route-tab exact :to="{ name: 'Dashboard' }" icon="home" />
+            <q-route-tab exact :to="{ name: 'Account' }" icon="person" />
+            <q-route-tab exact :to="{ name: 'Recents' }" icon="manage_search" />
+          </q-tabs>
+        </div>
+        <div class="scan-btn-wrapper">
+          <q-btn
+            icon="document_scanner"
+            class="scan-btn bg-primary"
+            flat
+            text-color="white"
+            :to="{ name: 'Quick Check' }"
+          />
+        </div>
+      </div>
+    </q-footer>
   </q-layout>
 </template>
 
 <script setup lang="ts">
 /* eslint-disable */
 import { useQuasar } from 'quasar';
+import { Title } from 'src/components';
 import { useAuthStore } from 'src/stores/auth-store';
 import { useUserStore } from 'src/stores/user-store';
 import { computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 const $q = useQuasar();
 const userStore = useUserStore();
 const authStore = useAuthStore();
 const router = useRouter();
+const route = useRoute();
 const leftDrawerOpen = ref<boolean>(false);
-const name = computed(() => userStore.getData?.name || '');
 
-const tab = ref<string>('home');
-
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value;
-}
+const isScanning = computed(() => route.name === 'Quick Check');
 
 function logout() {
   $q.dialog({
@@ -60,4 +73,30 @@ function logout() {
       });
   });
 }
+
+function refresh() {
+  location.reload();
+}
 </script>
+
+<style lang="scss">
+.bottom-nav {
+  // display: flex;
+  // align-items: end;
+
+  .scan-btn-wrapper {
+    height: 100%;
+    position: relative;
+  }
+
+  .scan-btn {
+    position: absolute;
+    --size: 5rem;
+    // width: var(--size);
+    width: 100%;
+    height: var(--size);
+    bottom: 0;
+    right: 0rem;
+  }
+}
+</style>

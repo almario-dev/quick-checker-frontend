@@ -29,6 +29,21 @@ const routes: RouteRecordRaw[] = [
     children: [
       // auth
       { path: '', name: 'Dashboard', component: () => import('pages/DashboardPage.vue') },
+      { path: 'account', name: 'Account', component: () => import('pages/AccountPage.vue') },
+      { path: 'recents', name: 'Recents', component: () => import('pages/RecentsPage.vue') },
+      { path: 'settings', name: 'Settings', component: () => import('pages/SettingsPage.vue') },
+    ],
+  },
+
+  // quick checker
+  {
+    path: '/quick-check',
+    redirect: { name: 'Upload' },
+    meta: { requireAuth: true },
+    name: 'Quick Check',
+    component: () => import('layouts/QuickCheckLayout.vue'),
+    children: [
+      { path: '', name: 'Upload', component: () => import('pages/quick-check/UploadPage.vue') },
     ],
   },
 

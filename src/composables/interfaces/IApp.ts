@@ -7,3 +7,10 @@ export interface AlertDialogConfig {
   onCancel?: () => void;
   onDismiss?: () => void;
 }
+
+export interface PreferencesProps {
+  aiChecker: boolean;
+  answerKeyMode: boolean;
+  skipPreview: boolean;
+  cameraDevice: string;
+}
