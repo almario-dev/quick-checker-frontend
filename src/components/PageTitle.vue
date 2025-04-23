@@ -1,5 +1,5 @@
 <template>
-  <div class="text-weight-medium text-[1.25rem] q-py-md text-center text-grey-8" v-bind="$attrs">
+  <div class="text-weight-medium text-[1rem] q-py-md text-center text-blue-grey-9" v-bind="$attrs">
     {{ title }}
   </div>
 </template>

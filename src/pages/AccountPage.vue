@@ -1,7 +1,5 @@
 <template>
   <q-page class="q-pa-md q-gutter-lg">
-    <Title title="Profile" />
-
     <q-card class="bg-transparent no-shadow">
       <q-card-section>
         <q-form>
@@ -50,7 +48,6 @@
 </template>
 
 <script setup lang="ts">
-import { Title } from 'src/components';
 import { useUserStore } from 'src/stores/user-store';
 import { reactive, ref } from 'vue';
 

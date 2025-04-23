@@ -2,9 +2,9 @@
   <q-layout view="lHh LpR fFf" class="text-blue-grey-10 layout-with-bg">
     <div class="animated-bg"></div>
 
-    <q-header v-if="!isScanning" reveal :reveal-offset="1" class="bg-transparent">
+    <q-header reveal :reveal-offset="1" class="bg-transparent">
       <q-toolbar class="flex items-center">
-        <Title title="History" class="grow" />
+        <Title v-if="pageTitle !== 'Dashboard'" :title="pageTitle" class="grow" />
         <q-btn icon="more_vert" text-color="grey-8" round flat class="q-ml-auto" />
       </q-toolbar>
     </q-header>
@@ -15,12 +15,12 @@
       </q-pull-to-refresh>
     </q-page-container>
 
-    <q-footer v-if="!isScanning" class="bg-white text-dark">
+    <q-footer class="bg-white text-dark">
       <div class="grid grid-rows-1 grid-cols-4 bottom-nav">
         <div class="col-span-3">
           <q-tabs class="bg-primary text-white" indicator-color="transparent" align="justify">
             <q-route-tab exact :to="{ name: 'Dashboard' }" icon="home" />
-            <q-route-tab exact :to="{ name: 'Account' }" icon="person" />
+            <q-route-tab exact :to="{ name: 'Profile' }" icon="person" />
             <q-route-tab exact :to="{ name: 'Recents' }" icon="manage_search" />
           </q-tabs>
         </div>
@@ -52,9 +52,10 @@ const userStore = useUserStore();
 const authStore = useAuthStore();
 const router = useRouter();
 const route = useRoute();
-const leftDrawerOpen = ref<boolean>(false);
 
-const isScanning = computed(() => route.name === 'Quick Check');
+const pageTitle = computed(() => {
+  return typeof route.name === 'string' ? route.name : String(route.name ?? '');
+});
 
 function logout() {
   $q.dialog({

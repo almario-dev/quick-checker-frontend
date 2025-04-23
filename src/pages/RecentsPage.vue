@@ -1,7 +1,5 @@
 <template>
   <q-page class="q-pa-md">
-    <Title title="History" />
-
     <q-card class="bg-transparent no-shadow">
       <q-card-section class="flex gap-[1rem] items-start q-px-none">
         <q-input class="grow" bottom-slots dense v-model="search" label="Search">
@@ -48,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { Image, Title } from 'src/components';
+import { Image } from 'src/components';
 import { ref } from 'vue';
 
 const search = ref<string>('');

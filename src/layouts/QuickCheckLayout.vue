@@ -3,7 +3,7 @@
     <q-header reveal :reveal-offset="50" class="bg-white">
       <q-toolbar class="flex items-center">
         <q-btn icon="arrow_back" text-color="grey-8" round flat class="q-mr-auto" @click="back" />
-        <Title class="grow" title="New Scan" />
+        <Title class="grow" :title="pageTitle" />
       </q-toolbar>
     </q-header>
 
@@ -22,9 +22,15 @@
 
 <script setup lang="ts">
 import { Title } from 'src/components';
-import { useRouter } from 'vue-router';
+import { computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
+const route = useRoute();
 const router = useRouter();
+
+const pageTitle = computed(() => {
+  return typeof route.name === 'string' ? route.name : String(route.name ?? '');
+});
 
 function back() {
   router.go(-1);
