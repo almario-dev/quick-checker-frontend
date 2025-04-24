@@ -57,70 +57,14 @@
         </q-card-section>
       </q-card>
 
-      <q-card class="bg-transparent no-shadow q-mb-md">
-        <q-card-section class="q-px-none">
-          <div class="flex items-center justify-between text-[1rem] font-[500] text-blue-grey-10">
-            <span>My Subjects</span>
-            <q-btn color="accent" size="0.785rem" dense icon="add" />
-          </div>
-        </q-card-section>
-
-        <q-card-section class="q-px-none q-pt-none">
-          <div class="bg-white shadow-3 rounded-borders">
-            <q-list separator>
-              <q-item v-for="i in 3" :key="i" class="q-py-md">
-                <q-item-section>
-                  <q-item-label lines="1" class="font-[600]">Science </q-item-label>
-                  <q-item-label lines="2" caption> Scanned: {{ i }} </q-item-label>
-                </q-item-section>
-
-                <q-item-section side>
-                  <q-btn size="12px" flat dense round icon="more_vert" />
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </div>
-
-          <div class="flex justify-center">
-            <q-btn label="show all" flat class="q-mt-md" text-color="blue-grey-5" />
-          </div>
-        </q-card-section>
-      </q-card>
+      <MySubjects />
     </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { Image } from 'src/components';
+import { Image, MySubjects } from 'src/components';
 import { useUserStore } from 'src/stores/user-store';
 
 const userStore = useUserStore();
 </script>
-
-<style>
-.wave-emoji {
-  display: inline-block;
-  animation: wave 1.5s ease-in-out infinite;
-}
-
-@keyframes wave {
-  0% {
-    transform: rotate(0deg);
-  }
-  20% {
-    transform: rotate(-15deg);
-  }
-  40% {
-    transform: rotate(15deg);
-  }
-  60% {
-    transform: rotate(-10deg);
-  }
-  80% {
-    transform: rotate(5deg);
-  }
-  100% {
-    transform: rotate(0deg);
-  }
-}
-</style>

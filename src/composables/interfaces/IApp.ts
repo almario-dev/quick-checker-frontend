@@ -14,3 +14,8 @@ export interface PreferencesProps {
   skipPreview: boolean;
   cameraDevice: string;
 }
+
+export interface Subject {
+  id: number;
+  name: string;
+}
