@@ -1,74 +1,51 @@
-import { ref } from 'vue';
+import { Camera, CameraResultType } from '@capacitor/camera';
 
-const videoElement = ref<HTMLVideoElement | null>(null);
-const stream = ref<MediaStream | null>(null);
-export const devices = ref<MediaDeviceInfo[]>([]);
+export const base64ToBlob = (base64: string, contentType: string): Blob => {
+  const byteCharacters = atob(base64);
+  const byteArrays = [];
 
-export const setVideoElement = (el: HTMLVideoElement) => {
-  videoElement.value = el;
-};
+  for (let i = 0; i < byteCharacters.length; i += 512) {
+    const slice = byteCharacters.slice(i, i + 512);
 
-export const start = async (deviceId: string): Promise<void> => {
-  // Stop any existing stream
-  if (stream.value) {
-    stream.value.getTracks().forEach((track) => track.stop());
-  }
-
-  const constraints = {
-    video: {
-      deviceId: { exact: deviceId },
-    },
-  };
-
-  try {
-    const newStream = await navigator.mediaDevices.getUserMedia(constraints);
-    stream.value = newStream;
-
-    if (videoElement.value) {
-      videoElement.value.srcObject = newStream;
-      await videoElement.value.play();
+    const byteNumbers = new Array(slice.length);
+    for (let j = 0; j < slice.length; j++) {
+      byteNumbers[j] = slice.charCodeAt(j);
     }
-  } catch (err) {
-    console.error('Error accessing camera:', err);
-    throw err;
+
+    const byteArray = new Uint8Array(byteNumbers);
+    byteArrays.push(byteArray);
   }
+
+  return new Blob(byteArrays, { type: contentType });
 };
 
-export const getDevices = async (): Promise<MediaDeviceInfo[]> => {
-  await navigator.mediaDevices.getUserMedia({ video: true }); // Prompt for permission
+export const formatBlobSize = (blob: Blob): string => {
+  const bytes = blob.size;
 
-  const mediaDevices = await navigator.mediaDevices.enumerateDevices();
+  if (bytes < 1024 * 1024) {
+    // Less than 1MB, show in KB
+    return `${(bytes / 1024).toFixed(2)} KB`;
+  }
 
-  devices.value = mediaDevices.filter((d) => d.kind === 'videoinput');
-
-  return devices.value;
+  // 1MB or more, show in MB
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 };
 
-// Helper to check if device is working
-async function isDeviceWorking(id: string): Promise<boolean> {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { deviceId: { exact: id } },
-    });
-    stream.getTracks().forEach((track) => track.stop());
-    return true;
-  } catch {
-    return false;
-  }
-}
+export const takePicture = async (): Promise<Blob> => {
+  const image = await Camera.getPhoto({
+    quality: 90,
+    resultType: CameraResultType.Base64,
+  });
 
-export async function findWorkingDevice(deviceId: string): Promise<MediaDeviceInfo | null> {
-  // Check if the passed deviceId is working
-  if (await isDeviceWorking(deviceId)) {
-    return devices.value.find((d) => d.deviceId === deviceId) ?? null;
+  if (!image.base64String) {
+    throw new Error('PARSING_ERROR');
   }
 
-  // If not, find the first working one in the array
-  for (const device of devices.value) {
-    if (await isDeviceWorking(device.deviceId)) {
-      return device;
-    }
-  }
+  const blob = base64ToBlob(image.base64String, `image/${image.format}`);
 
-  return null; // No working device found
-}
+  return blob;
+};
+
+export const blobToImageUrl = (blob: Blob): string => {
+  return URL.createObjectURL(blob);
+};

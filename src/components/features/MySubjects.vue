@@ -10,7 +10,7 @@
     <q-card-section class="q-px-none q-pt-none">
       <div class="bg-white shadow-3 rounded-borders">
         <q-list separator>
-          <q-item v-for="subject in list" :key="subject.id" class="q-py-md">
+          <q-item v-for="subject in paginatedSubjects" :key="subject.id" class="q-py-md">
             <q-item-section>
               <q-item-label lines="1" class="font-[600]">{{ subject.name }} </q-item-label>
               <q-item-label lines="2" caption> Scanned: 0 </q-item-label>
@@ -34,68 +34,63 @@
         </q-list>
       </div>
 
-      <div class="flex justify-center">
-        <q-btn label="show all" flat class="q-mt-md" text-color="blue-grey-5" />
+      <div class="flex justify-center q-mt-md">
+        <q-pagination
+          v-model="page"
+          :max="maxPage"
+          :max-pages="5"
+          boundary-numbers
+          size="0.75rem"
+          color="grey-7"
+        />
       </div>
     </q-card-section>
   </q-card>
 
-  <SubjectDialog v-model:dialog="dialog" v-model:edit="editModel" @success="fetchSubjects" />
+  <SubjectDialog v-model:dialog="dialog" v-model:edit="editModel" @success="subjectStore.fetch" />
 </template>
 
 <script setup lang="ts">
+/* eslint-disable */
 import { useQuasar } from 'quasar';
-import { api } from 'src/boot/axios';
 import type { Subject } from 'src/composables/interfaces/IApp';
-import { useAlertStore } from 'src/stores/alert-store';
-import { onBeforeMount, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { SubjectDialog } from '..';
+import { useSubjectStore } from 'src/stores/subject-store';
+import { skip } from 'src/assets/utils';
 
 const $q = useQuasar();
-const alertStore = useAlertStore();
+const subjectStore = useSubjectStore();
+
 const dialog = ref<boolean>(false);
-const list = ref<Subject[]>([]);
 const editModel = ref<Subject | null>(null);
 
-onBeforeMount(async () => {
-  try {
-    await Promise.all([fetchSubjects()]);
-  } catch (error) {
-    console.error('Task has failed: ', error);
-  }
+const page = ref(1);
+const perPage = 5;
+
+const maxPage = computed(() => Math.ceil(subjectStore.getSubjects.length / perPage));
+
+const paginatedSubjects = computed(() => {
+  const start = (page.value - 1) * perPage;
+  const end = start + perPage;
+  return subjectStore.getSubjects.slice(start, end);
 });
 
-async function fetchSubjects(): Promise<void> {
-  try {
-    const { data } = await api.get('subjects');
-    list.value = data;
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-function openEditDialog(subject: Subject) {
+const openEditDialog = (subject: Subject) => {
   editModel.value = subject;
   dialog.value = true;
-}
+};
 
-function deleteSubject(subject: Subject) {
+const deleteSubject = (subject: Subject) => {
   $q.dialog({
     title: 'Confirm Delete',
     message: "Do you really want to delete this subject? You won't be able to use it again.",
     cancel: true,
     ok: 'Yes',
   }).onOk(() => {
-    api
-      .delete('subjects/' + subject.id)
-      .then(() => {
-        fetchSubjects().catch(() => {});
-        alertStore.Swap({ type: 'info', message: 'Subject has been deleted.' });
-      })
-      .catch((err) => {
-        const message = err?.response?.data?.message || 'Something went wrong';
-        alertStore.Swap({ message, type: 'negative' });
-      });
+    subjectStore.archive(subject.id).catch(skip);
   });
-}
+};
+
+onMounted(subjectStore.init);
 </script>

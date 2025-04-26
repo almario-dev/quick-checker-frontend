@@ -35,6 +35,23 @@ const routes: RouteRecordRaw[] = [
     ],
   },
 
+  // app
+  {
+    path: '/',
+    redirect: { name: 'Create Answer Key' },
+    meta: { requireAuth: true },
+    name: 'App',
+    component: () => import('layouts/FullScreenLayout.vue'),
+    children: [
+      // ...
+      {
+        path: 'create-answer-key',
+        name: 'Create Answer Key',
+        component: () => import('pages/CreateAnswerKey.vue'),
+      },
+    ],
+  },
+
   // quick checker
   {
     path: '/quick-check',
@@ -43,7 +60,17 @@ const routes: RouteRecordRaw[] = [
     name: 'Quick Check',
     component: () => import('layouts/QuickCheckLayout.vue'),
     children: [
-      { path: '', name: 'New Scan', component: () => import('pages/quick-check/UploadPage.vue') },
+      { path: '', name: 'New Scan', component: () => import('pages/quick-check/NewScan.vue') },
+      {
+        path: 'select-test',
+        name: 'Select Test',
+        component: () => import('pages/quick-check/SelectOrCreate.vue'),
+      },
+      {
+        path: 'setup',
+        name: 'Setup',
+        component: () => import('pages/quick-check/SetupTest.vue'),
+      },
     ],
   },
 

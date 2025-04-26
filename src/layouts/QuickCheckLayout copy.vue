@@ -1,15 +1,22 @@
 <template>
   <q-layout view="lHh LpR fFf" class="text-blue-grey-10 bg-white">
-    <q-header reveal :reveal-offset="1" class="bg-transparent">
+    <q-header reveal :reveal-offset="50" class="bg-white">
       <q-toolbar class="flex items-center">
-        <q-btn icon="arrow_back" dense round flat color="grey-7" @click="back" />
-        <Title :title="pageTitle" class="grow" />
+        <q-btn icon="arrow_back" text-color="grey-8" round flat class="q-mr-auto" @click="back" />
+        <Title class="grow" :title="pageTitle" />
       </q-toolbar>
     </q-header>
 
     <q-page-container>
       <router-view />
     </q-page-container>
+
+    <q-footer reveal class="bg-transparent" elevated>
+      <div class="flex q-px-lg q-py-md items-stretch gap-4 bg-white">
+        <q-btn color="positive" padding="1rem" icon="spellcheck" />
+        <q-btn class="grow" color="primary" label="Quick Check" />
+      </div>
+    </q-footer>
   </q-layout>
 </template>
 
@@ -25,5 +32,7 @@ const pageTitle = computed(() => {
   return typeof route.name === 'string' ? route.name : String(route.name ?? '');
 });
 
-const back = (): void => router.go(-1);
+function back() {
+  router.go(-1);
+}
 </script>

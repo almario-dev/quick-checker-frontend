@@ -1,6 +1,9 @@
 <template>
   <div
-    :class="['text-weight-medium text-[1rem]  text-blue-grey-9', { 'q-py-md text-center': dialog }]"
+    :class="[
+      'text-weight-medium text-[1rem]  text-blue-grey-9',
+      { 'q-py-md text-center': !dialog },
+    ]"
     v-bind="$attrs"
   >
     {{ title }}

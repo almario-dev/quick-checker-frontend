@@ -1,12 +1,12 @@
 <template>
   <q-form autofocus @submit.prevent="submit">
-    <q-card-section v-if="!noTitle">
+    <q-card-section v-if="!noTitle || !!title">
       <slot name="title">
-        <TitleElement :title="title" class="text-left" />
+        <TitleElement dialog :title="title || ''" :class="['text-left', titleClass]" />
       </slot>
     </q-card-section>
 
-    <q-card-section :class="['q-gutter-y-md', bodyClass]">
+    <q-card-section :class="['flex column gap-4', bodyClass]">
       <slot />
     </q-card-section>
 
@@ -30,8 +30,9 @@ import { Title as TitleElement } from '.';
 
 withDefaults(
   defineProps<{
-    title: string;
+    title?: string;
     noTitle?: boolean;
+    titleClass?: string;
     noActions?: boolean;
     bodyClass?: string;
     disableActions?: boolean;

@@ -1,9 +1,8 @@
 <template>
-  <q-layout view="lHh LpR fFf" class="text-blue-grey-10 bg-white">
+  <q-layout view="lHh LpR fFf">
     <q-header reveal :reveal-offset="1" class="bg-transparent">
       <q-toolbar class="flex items-center">
         <q-btn icon="arrow_back" dense round flat color="grey-7" @click="back" />
-        <Title :title="pageTitle" class="grow" />
       </q-toolbar>
     </q-header>
 
@@ -14,16 +13,9 @@
 </template>
 
 <script setup lang="ts">
-import { Title } from 'src/components';
-import { computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 
-const route = useRoute();
 const router = useRouter();
-
-const pageTitle = computed(() => {
-  return typeof route.name === 'string' ? route.name : String(route.name ?? '');
-});
 
 const back = (): void => router.go(-1);
 </script>

@@ -12,7 +12,7 @@
           filled
           class="shadow-2"
           bg-color="grey-1"
-          v-model="testTitle"
+          v-model="fields.testName"
           label="Test Name"
         >
           <template v-slot:append>
@@ -24,9 +24,11 @@
           filled
           class="shadow-2"
           bg-color="grey-1"
-          v-model="subject"
+          v-model="fields.subject"
           label="Subject"
           :options="subjectOptions"
+          option-label="name"
+          option-value="id"
         />
 
         <div class="flex items-center justify-between no-wrap gap-4">
@@ -34,7 +36,7 @@
             <span class="text-body text-weight-medium">AI Assistance</span>
             <span class="text-caption text-grey-7"> Apply AI's general knowledge reasoning </span>
           </div>
-          <q-toggle v-model="aiAssistance" icon="smart_toy" color="secondary" />
+          <q-toggle v-model="fields.aiAssistance" icon="smart_toy" color="secondary" />
         </div>
       </q-form>
       <q-separator />
@@ -47,16 +49,26 @@
             color="cyan-6"
             label="Scan Answer Sheets"
             padding="0.7rem"
+            @click="scanAnswerSheets"
           />
         </q-card-section>
 
         <q-card-section class="q-px-none">
           <q-list class="q-gutter-sm">
-            <q-item v-for="i in 20" :key="i" class="q-px-none">
+            <q-item
+              v-for="(sheet, i) in revAnswerSheets"
+              :key="i"
+              class="q-px-none"
+              v-ripple
+              clickable
+              @click="openPreviewDialog(sheet)"
+            >
               <q-item-section avatar>
                 <q-img
-                  src="https://www.shutterstock.com/image-vector/document-contract-papers-paper-documents-600nw-2496821589.jpg"
+                  :ratio="3 / 4"
+                  :src="blobToImageUrl(sheet.file)"
                   alt=""
+                  style="max-height: 4rem"
                 />
               </q-item-section>
 
@@ -64,7 +76,7 @@
                 <q-item-label lines="1">
                   <span class="text-weight-medium">Student Answer {{ i }}</span>
                 </q-item-label>
-                <q-item-label caption>complete</q-item-label>
+                <q-item-label caption>{{ formatBlobSize(sheet.file) }}</q-item-label>
               </q-item-section>
 
               <q-item-section side>
@@ -79,14 +91,55 @@
       </q-card>
     </div>
   </q-page>
+
+  <!-- <Preview v-model:dialog="previewDialog" v-model:preview="previewSheet" /> -->
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
+import type { AnswerSheet, Subject } from 'src/composables/interfaces/IApp';
+import { blobToImageUrl, formatBlobSize, takePicture } from 'src/composables/useCamera';
+import { useAlertStore } from 'src/stores/alert-store';
+import { useSubjectStore } from 'src/stores/subject-store';
+// import { Preview } from 'src/components';
+import { newAnswerSheet } from 'src/assets/utils';
 
-const testTitle = ref<string>('');
-const subject = ref<string>('');
-const aiAssistance = ref<boolean>(false);
+const subjectStore = useSubjectStore();
+const alertStore = useAlertStore();
 
-const subjectOptions = ['Subject 1', 'Subject 2'];
+const answerSheets = ref<AnswerSheet[]>([]);
+const previewDialog = ref<boolean>(false);
+const previewSheet = ref<AnswerSheet | null>(null);
+
+const fields = reactive({
+  testName: '' as string,
+  subject: null as Subject | null,
+  aiAssistance: false as boolean,
+});
+
+const subjectOptions = computed(() => subjectStore.getSubjects);
+
+const revAnswerSheets = computed(() => [...answerSheets.value].reverse());
+
+const openPreviewDialog = (image: AnswerSheet) => {
+  previewSheet.value = image;
+  previewDialog.value = true;
+};
+
+const scanAnswerSheets = async (): Promise<void> => {
+  try {
+    const file = await takePicture();
+
+    const obj = newAnswerSheet(file);
+
+    answerSheets.value.push(obj);
+    openPreviewDialog(obj);
+  } catch (err) {
+    if (err instanceof Error && err.message === 'PARSING_ERROR') {
+      alertStore.Swap({ message: 'Unable to process images from camera' });
+    }
+
+    console.error(err);
+  }
+};
 </script>

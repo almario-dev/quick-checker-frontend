@@ -18,10 +18,10 @@
 import type { Subject } from 'src/composables/interfaces/IApp';
 import { CustomForm } from '..';
 import { computed, ref, watch } from 'vue';
-import { api } from 'src/boot/axios';
-import { useAlertStore } from 'src/stores/alert-store';
+import { useSubjectStore } from 'src/stores/subject-store';
+import { skip } from 'src/assets/utils';
 
-const alertStore = useAlertStore();
+const subjectStore = useSubjectStore();
 
 const props = withDefaults(
   defineProps<{
@@ -64,6 +64,12 @@ const wait = () => (idleMode.value = true);
 
 const complete = () => (idleMode.value = false);
 
+const done = () => {
+  emit('success');
+  emit('update:dialog', false);
+  name.value = '';
+};
+
 const onHide = () => {
   idleMode.value = false;
   emit('update:edit', null);
@@ -73,39 +79,16 @@ const submit = () => {
   wait();
 
   if (!props.edit) {
-    // add new subject
-    api
-      .post('subjects', { name: name.value })
-      .then(() => {
-        emit('success');
-        emit('update:dialog', false);
-
-        name.value = '';
-
-        alertStore.Swap({ type: 'positive', message: 'A new subject has been added.' });
-      })
-      .catch((err) => {
-        const message =
-          err?.response?.data?.message || 'Unable to add new subject. Please try again.';
-        alertStore.Swap({ type: 'negative', message });
-      })
+    subjectStore
+      .create(name.value) // create
+      .then(done)
+      .catch(skip)
       .finally(complete);
   } else if (props.edit.id) {
-    // edit
-    api
-      .put('subjects/' + props.edit.id, { name: name.value })
-      .then(() => {
-        emit('success');
-        emit('update:dialog', false);
-
-        name.value = '';
-
-        alertStore.Swap({ type: 'positive', message: 'Updated successfully.' });
-      })
-      .catch((err) => {
-        const message = err?.response?.data?.message || 'Unable to save changes. Please try again.';
-        alertStore.Swap({ type: 'negative', message });
-      })
+    subjectStore
+      .update(props.edit.id, name.value) // update
+      .then(done)
+      .catch(skip)
       .finally(complete);
   }
 };
