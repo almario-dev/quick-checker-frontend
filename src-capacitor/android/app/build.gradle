@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "org.quickchecker.ai.app"
+    namespace "com.quick_checker.ai"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "org.quickchecker.ai.app"
+        applicationId "com.quick_checker.ai"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

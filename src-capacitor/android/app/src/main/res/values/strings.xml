@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">Quick Checker</string>
     <string name="title_activity_main">Quick Checker</string>
-    <string name="package_name">org.quickchecker.ai.app</string>
-    <string name="custom_url_scheme">org.quickchecker.ai.app</string>
+    <string name="package_name">com.quick_checker.ai</string>
+    <string name="custom_url_scheme">com.quick_checker.ai</string>
 </resources>

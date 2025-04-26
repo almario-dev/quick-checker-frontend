@@ -1,4 +1,4 @@
-package org.quickchecker.ai.app;
+package com.quick_checker.ai;
 
 import com.getcapacitor.BridgeActivity;
 

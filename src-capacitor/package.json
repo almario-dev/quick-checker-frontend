@@ -5,11 +5,11 @@
   "author": "Almario Miano <almariomiano@gmail.com>",
   "private": true,
   "dependencies": {
-    "@capacitor-community/camera-preview": "^7.0.1",
     "@capacitor/android": "^7.2.0",
     "@capacitor/app": "^7.0.0",
     "@capacitor/camera": "^7.0.1",
     "@capacitor/cli": "^7.0.0",
-    "@capacitor/core": "^7.0.0"
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/filesystem": "^7.0.1"
   }
 }
