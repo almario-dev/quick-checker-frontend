@@ -7,6 +7,8 @@ import { useRouter } from 'vue-router';
 import { useRequestController } from 'src/composables/useRequestController';
 import { useAlertStore } from './alert-store';
 import { api } from 'src/boot/axios';
+import { useAnswerSheetStore } from './answer-sheet-store';
+import { skip } from 'src/assets/utils';
 
 export const useScanStore = defineStore('scan', () => {
   const { send } = useRequestController();
@@ -14,15 +16,13 @@ export const useScanStore = defineStore('scan', () => {
   const router = useRouter();
   const alertStore = useAlertStore();
   const answerKeyStore = useAnswerKeyStore();
+  const answerSheetStore = useAnswerSheetStore();
 
   const answerKey = ref<AnswerKey | null>(null);
   const documents = ref<LocalFileType[]>([]);
   const aiCheck = ref<boolean>(false);
-  const metadata = reactive({
-    studentName: null as string | null,
-  });
+  const metadata = reactive({ studentName: null as string | null });
   const subject = ref<Subject | null>(null);
-
   const createThenScan = ref<boolean>(false);
 
   const getAnswerKey = computed(() => answerKey.value);
@@ -46,41 +46,66 @@ export const useScanStore = defineStore('scan', () => {
     return await send(
       'quick-check',
       async (): Promise<void> => {
-        if (!documents.value.length) {
-          alertStore.Swap({
-            type: 'warning',
-            message: 'Please upload the appropriate document(s).',
-          });
+        const showAlert = (message: string): void => {
+          alertStore.Swap({ type: 'warning', message });
+        };
 
+        // Validate inputs
+        if (!documents.value.length) {
+          showAlert('Please upload the appropriate document(s).');
           return;
         }
 
-        if (!answerKey.value) {
-          alertStore.Swap({
-            type: 'warning',
-            message: 'Please select the answer key source to proceed.',
-          });
+        if (!answerKey.value && !aiCheck.value) {
+          showAlert('Please select the answer key source to proceed.');
           return;
         }
 
         if (!subject.value) {
-          alertStore.Swap({ type: 'warning', message: 'Please select the appropriate subject.' });
+          showAlert('Please select the appropriate subject.');
           return;
         }
 
-        const form = new FormData();
-        form.append('student_name', metadata.studentName || '');
-        form.append('subject', subject.value.id.toString());
-        form.append('answer_key', answerKey.value.id.toString());
-        form.append('ai_check', aiCheck.value ? '1' : '0');
+        const formData = new FormData();
+        const formDataFields = [
+          { key: 'student_name', value: metadata.studentName || '' },
+          { key: 'subject', value: subject.value.id.toString() },
+          { key: 'ai_check', value: aiCheck.value ? '1' : '0' },
+        ];
+
+        if (!aiCheck.value && answerKey.value) {
+          formDataFields.push({ key: 'answer_key', value: answerKey.value.id.toString() });
+        }
+
+        formDataFields.forEach((field) => formData.append(field.key, field.value));
 
         documents.value.forEach((file: LocalFileType) => {
-          form.append('documents[]', file.file);
+          formData.append('documents[]', file.file);
         });
 
-        const { data } = await api.post('scan', form);
+        const tempId = 'as' + Date.now();
 
-        console.log(data);
+        // Add the raw data for immediate feedback
+        answerSheetStore.addRaw({
+          id: tempId,
+          answer_key: answerKey.value?.id || 0,
+          subject: subject.value,
+          student_name: metadata.studentName || '',
+        });
+
+        router.push({ name: 'Recents' }).catch(skip);
+
+        try {
+          const { data } = await api.post('scan', formData);
+          answerSheetStore.updateRawSheet(tempId, data);
+        } catch (error) {
+          alertStore.Swap({
+            type: 'error',
+            message: 'An error occurred while processing the request.',
+          });
+
+          throw error;
+        }
       },
       { mode: 'debounce' },
     );
