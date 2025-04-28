@@ -4,8 +4,28 @@
 
     <q-header reveal :reveal-offset="1" class="bg-transparent">
       <q-toolbar class="flex items-center">
+        <q-btn
+          v-if="pageTitle !== 'Dashboard'"
+          icon="arrow_back"
+          dense
+          round
+          flat
+          color="grey-7"
+          @click="back"
+        />
         <Title v-if="pageTitle !== 'Dashboard'" :title="pageTitle" class="grow" />
-        <q-btn icon="more_vert" text-color="grey-8" round flat class="q-ml-auto" />
+        <q-btn icon="more_vert" text-color="grey-8" round flat class="q-ml-auto">
+          <q-menu>
+            <q-list style="min-width: 100px">
+              <q-item clickable v-close-popup>
+                <q-item-section>Settings</q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup @click="logout">
+                <q-item-section>Logout</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
       </q-toolbar>
     </q-header>
 
@@ -39,19 +59,25 @@
 </template>
 
 <script setup lang="ts">
-/* eslint-disable */
 import { useQuasar } from 'quasar';
+import { skip } from 'src/assets/utils';
 import { Title } from 'src/components';
+import { useAlertStore } from 'src/stores/alert-store';
+import { useAnswerKeyStore } from 'src/stores/answer-key-store';
+import { useAnswerSheetStore } from 'src/stores/answer-sheet-store';
 import { useAuthStore } from 'src/stores/auth-store';
 import { useScanStore } from 'src/stores/scan-store';
 import { useSubjectStore } from 'src/stores/subject-store';
-import { computed, onMounted, ref } from 'vue';
+import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const $q = useQuasar();
 const authStore = useAuthStore();
-const subjectStore = useSubjectStore();
+const alertStore = useAlertStore();
 const scanStore = useScanStore();
+const answerSheetStore = useAnswerSheetStore();
+const answerKeyStore = useAnswerKeyStore();
+const subjectStore = useSubjectStore();
 
 const router = useRouter();
 const route = useRoute();
@@ -60,34 +86,46 @@ const pageTitle = computed(() => {
   return typeof route.name === 'string' ? route.name : String(route.name ?? '');
 });
 
-function logout() {
+const logout = (): void => {
   $q.dialog({
-    title: 'Do you really wish to logout?',
+    title: 'Logout?',
     message: 'You will be redirected back to the login page',
     cancel: true,
   }).onOk(() => {
     authStore
       .logout()
       .then(() => {
-        // fuck eslint!!
-        router.push({ name: 'Guest' }).catch(() => {});
+        subjectStore.resetState();
+        answerSheetStore.resetState();
+        answerKeyStore.resetState();
+        scanStore.resetState();
+
+        router.push({ name: 'Guest' }).catch(skip);
       })
       .catch(() => {
-        $q.notify({ type: 'negative', message: 'Fail to logout' });
+        alertStore.Stack({ type: 'negative', message: 'Fail to logout' });
       });
   });
-}
+};
 
-function refresh() {
-  location.reload();
-}
+const refresh = async (done: () => void): Promise<void> => {
+  try {
+    subjectStore.cancelAll();
+    answerSheetStore.cancelAll();
+
+    await authStore.refresh();
+    await Promise.all([subjectStore.init(), answerKeyStore.fetch(), answerSheetStore.init()]);
+    done();
+  } catch (error) {
+    console.error('Task has failed: ', error);
+  }
+};
+
+const back = (): void => router.go(-1);
 </script>
 
 <style lang="scss">
 .bottom-nav {
-  // display: flex;
-  // align-items: end;
-
   .scan-btn-wrapper {
     height: 100%;
     position: relative;
@@ -96,7 +134,6 @@ function refresh() {
   .scan-btn {
     position: absolute;
     --size: 5rem;
-    // width: var(--size);
     width: 100%;
     height: var(--size);
     bottom: 0;

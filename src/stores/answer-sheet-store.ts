@@ -35,7 +35,7 @@ export const isChecked = (sheet: AnswerSheet | AnswerSheetRawResult): boolean =>
 };
 
 export const useAnswerSheetStore = defineStore('answer-sheet', () => {
-  const { send, runOnce } = useRequestController();
+  const { send, runOnce, reset, resetAll, cancelAll } = useRequestController();
 
   const list = ref<(AnswerSheet | AnswerSheetRawResult)[]>([]);
   const pendingIds = ref<Set<string>>(new Set());
@@ -93,6 +93,12 @@ export const useAnswerSheetStore = defineStore('answer-sheet', () => {
     });
   };
 
+  const resetState = (): void => {
+    cancelAll();
+    list.value = [];
+    pendingIds.value.clear();
+  };
+
   return {
     list,
     getList,
@@ -100,5 +106,9 @@ export const useAnswerSheetStore = defineStore('answer-sheet', () => {
     updateRawSheet,
     fetch,
     init,
+    reset,
+    resetAll,
+    cancelAll,
+    resetState,
   };
 });

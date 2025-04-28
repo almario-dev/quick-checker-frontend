@@ -17,7 +17,7 @@ export const useSubjectStore = defineStore('subject', () => {
 
   const getSubjects = computed(() => subjects.value);
 
-  const { send, runOnce } = useRequestController();
+  const { send, runOnce, reset, resetAll, cancelAll } = useRequestController();
 
   const fetch = async (): Promise<void> => {
     await send(
@@ -96,5 +96,23 @@ export const useSubjectStore = defineStore('subject', () => {
     });
   };
 
-  return { subjects, getSubjects, hasFetched, fetch, archive, create, update, init };
+  const resetState = (): void => {
+    cancelAll();
+    subjects.value = [];
+  };
+
+  return {
+    subjects,
+    getSubjects,
+    hasFetched,
+    fetch,
+    archive,
+    create,
+    update,
+    init,
+    reset,
+    resetAll,
+    cancelAll,
+    resetState,
+  };
 });

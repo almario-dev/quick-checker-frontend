@@ -49,7 +49,7 @@ export interface AnswerKeyResultSet {
 }
 
 export const useAnswerKeyStore = defineStore('answer-key', () => {
-  const { send } = useRequestController();
+  const { send, cancelAll } = useRequestController();
   const alertStore = useAlertStore();
 
   const answerKeys = ref<AnswerKeyBasic[]>([]);
@@ -158,6 +158,12 @@ export const useAnswerKeyStore = defineStore('answer-key', () => {
     );
   };
 
+  const resetState = (): void => {
+    cancelAll();
+    answerKeys.value = [];
+    resetModel();
+  };
+
   return {
     answerKeys,
     newModel,
@@ -169,5 +175,7 @@ export const useAnswerKeyStore = defineStore('answer-key', () => {
     archive,
     resetModel,
     fetchFullDetails,
+    cancelAll,
+    resetState,
   };
 });

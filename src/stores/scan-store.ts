@@ -11,7 +11,7 @@ import { useAnswerSheetStore } from './answer-sheet-store';
 import { skip } from 'src/assets/utils';
 
 export const useScanStore = defineStore('scan', () => {
-  const { send } = useRequestController();
+  const { send, cancelAll } = useRequestController();
 
   const router = useRouter();
   const alertStore = useAlertStore();
@@ -111,6 +111,19 @@ export const useScanStore = defineStore('scan', () => {
     );
   };
 
+  const resetForm = (): void => {
+    answerKey.value = null;
+    documents.value = [];
+    aiCheck.value = false;
+    metadata.studentName = null;
+    subject.value = null;
+  };
+
+  const resetState = (): void => {
+    cancelAll();
+    resetForm();
+  };
+
   return {
     answerKey,
     getAnswerKey,
@@ -124,5 +137,8 @@ export const useScanStore = defineStore('scan', () => {
     scanNow,
     quickCheck,
     removeDocument,
+    cancelAll,
+    resetState,
+    resetForm,
   };
 });
