@@ -3,29 +3,32 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { watch } from 'vue';
 import { useSubjectStore } from './stores/subject-store';
-import { useAuthStore } from './stores/auth-store';
 import { useAnswerKeyStore } from './stores/answer-key-store';
 import { useAnswerSheetStore } from './stores/answer-sheet-store';
+import { useUserStore } from './stores/user-store';
 
 const answerSheetStore = useAnswerSheetStore();
 const answerKeyStore = useAnswerKeyStore();
 const subjectStore = useSubjectStore();
-const authStore = useAuthStore();
+const userStore = useUserStore();
 
-onMounted(async () => {
-  try {
-    if (authStore.getToken) {
+watch(
+  () => userStore.isAuthenticated,
+  async (isAuth): Promise<void> => {
+    if (!isAuth) return;
+
+    try {
       await Promise.all([
         //
         subjectStore.init(),
         answerKeyStore.fetch(),
         answerSheetStore.init(),
       ]);
+    } catch (error) {
+      console.error('Task has failed: ', error);
     }
-  } catch (error) {
-    console.error('Task has failed: ', error);
-  }
-});
+  },
+);
 </script>

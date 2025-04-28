@@ -7,10 +7,9 @@ export { default as CustomForm } from './FormComponent.vue';
 // features
 export { default as MySubjects } from './features/MySubjects.vue';
 export { default as DocumentsGrid } from './DocumentsGrid.vue';
+export { default as AnswerSheets } from './features/AnswerSheetsList.vue';
 
 // dialogs
 export { default as SubjectDialog } from './dialogs/SubjectFormDialog.vue';
-// export { default as Preview } from './dialogs/PreviewImageScan.vue';
-export { default as CreateTest } from './dialogs/NewTest.vue';
 export { default as Preview } from './dialogs/SnapshopPreview.vue';
 export { default as SelectAnswerKey } from './dialogs/SelectAnswerKey.vue';
