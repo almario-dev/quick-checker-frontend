@@ -49,6 +49,11 @@ const routes: RouteRecordRaw[] = [
         name: 'Create Answer Key',
         component: () => import('pages/CreateAnswerKey.vue'),
       },
+      {
+        path: 'scan-answer-sheets',
+        name: 'Scan Answer Sheets',
+        component: () => import('pages/ScanAnswerSheets.vue'),
+      },
     ],
   },
 

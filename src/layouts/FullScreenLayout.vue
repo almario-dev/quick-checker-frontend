@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh LpR fFf">
+  <q-layout view="lHh LpR fFf" :class="bgColor">
     <q-header reveal :reveal-offset="1" class="bg-transparent">
       <q-toolbar class="flex items-center">
         <q-btn icon="arrow_back" dense round flat color="grey-7" @click="back" />
@@ -13,9 +13,15 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const router = useRouter();
+const route = useRoute();
+
+const bgColor = computed(() =>
+  route.name === 'Scan Answer Sheets' ? 'bg-white' : 'bg-transparent',
+);
 
 const back = (): void => router.go(-1);
 </script>
