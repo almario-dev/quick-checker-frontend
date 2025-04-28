@@ -7,7 +7,9 @@ import { onMounted } from 'vue';
 import { useSubjectStore } from './stores/subject-store';
 import { useAuthStore } from './stores/auth-store';
 import { useAnswerKeyStore } from './stores/answer-key-store';
+import { useAnswerSheetStore } from './stores/answer-sheet-store';
 
+const answerSheetStore = useAnswerSheetStore();
 const answerKeyStore = useAnswerKeyStore();
 const subjectStore = useSubjectStore();
 const authStore = useAuthStore();
@@ -15,7 +17,12 @@ const authStore = useAuthStore();
 onMounted(async () => {
   try {
     if (authStore.getToken) {
-      await Promise.all([subjectStore.init(), answerKeyStore.fetch()]);
+      await Promise.all([
+        //
+        subjectStore.init(),
+        answerKeyStore.fetch(),
+        answerSheetStore.init(),
+      ]);
     }
   } catch (error) {
     console.error('Task has failed: ', error);
