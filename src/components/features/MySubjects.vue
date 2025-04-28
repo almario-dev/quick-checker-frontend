@@ -13,7 +13,6 @@
           <q-item v-for="subject in paginatedSubjects" :key="subject.id" class="q-py-md">
             <q-item-section>
               <q-item-label lines="1" class="font-[600]">{{ subject.name }} </q-item-label>
-              <q-item-label lines="2" caption> Scanned: 0 </q-item-label>
             </q-item-section>
 
             <q-item-section side>
@@ -51,7 +50,6 @@
 </template>
 
 <script setup lang="ts">
-/* eslint-disable */
 import { useQuasar } from 'quasar';
 import type { Subject } from 'src/composables/interfaces/IApp';
 import { computed, onMounted, ref } from 'vue';
