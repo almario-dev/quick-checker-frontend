@@ -16,7 +16,13 @@
             <strong>💡 AI Tip:</strong>
             <i> Lighting matters! Avoid shadows when scanning. </i>
           </p>
-          <q-btn label="Scan Now" color="secondary" icon="document_scanner" padding="0.7rem" />
+          <q-btn
+            label="Scan Now"
+            color="secondary"
+            icon="document_scanner"
+            padding="0.7rem"
+            @click="scanStore.scanNow"
+          />
         </q-card-section>
       </q-card>
 
@@ -26,33 +32,10 @@
         </q-card-section>
 
         <q-card-section class="q-px-none q-py-none">
-          <q-list class="q-gutter-y-md">
-            <q-item
-              v-for="i in 3"
-              :key="i"
-              class="bg-white shadow-3 rounded-borders"
-              clickable
-              v-ripple
-            >
-              <q-item-section avatar>
-                <q-avatar rounded size="4rem">
-                  <Image size="lg" />
-                </q-avatar>
-              </q-item-section>
-
-              <q-item-section>
-                <q-item-label lines="1" class="font-[600]">Grade 5 Science </q-item-label>
-                <q-item-label lines="2" caption> 1 student got a perfect score! 🎉 </q-item-label>
-              </q-item-section>
-
-              <q-item-section side>
-                <q-item-label>1 min ago</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
+          <AnswerSheets v-model:list="answerSheetStore.list" no-pagination :display-only="5" />
 
           <div class="flex justify-center">
-            <q-btn label="View More" flat class="q-mt-md" text-color="blue-grey-5" />
+            <q-btn label="View More" flat text-color="blue-grey-5" :to="{ name: 'Recents' }" />
           </div>
         </q-card-section>
       </q-card>
@@ -63,8 +46,13 @@
 </template>
 
 <script setup lang="ts">
-import { Image, MySubjects } from 'src/components';
+import { MySubjects } from 'src/components';
+import { useScanStore } from 'src/stores/scan-store';
 import { useUserStore } from 'src/stores/user-store';
+import { AnswerSheets } from '../components';
+import { useAnswerSheetStore } from 'src/stores/answer-sheet-store';
 
 const userStore = useUserStore();
+const scanStore = useScanStore();
+const answerSheetStore = useAnswerSheetStore();
 </script>
