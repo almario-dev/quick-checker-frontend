@@ -63,6 +63,9 @@ export const useAnswerKeyStore = defineStore('answer-key', () => {
 
   const getList = computed(() => answerKeys.value);
 
+  const get = (id: number): AnswerKeyBasic | undefined =>
+    answerKeys.value.find((a: AnswerKeyBasic) => a.id === id);
+
   const getNewModelData = computed(() => {
     const { name, subject, useQuestionnaire, attachments } = newModel;
 
@@ -159,6 +162,7 @@ export const useAnswerKeyStore = defineStore('answer-key', () => {
     answerKeys,
     newModel,
     getList,
+    get,
     create,
     removeAttachment,
     fetch,
