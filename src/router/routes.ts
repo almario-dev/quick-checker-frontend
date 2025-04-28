@@ -57,28 +57,6 @@ const routes: RouteRecordRaw[] = [
     ],
   },
 
-  // quick checker
-  {
-    path: '/quick-check',
-    redirect: { name: 'New Scan' },
-    meta: { requireAuth: true },
-    name: 'Quick Check',
-    component: () => import('layouts/QuickCheckLayout.vue'),
-    children: [
-      { path: '', name: 'New Scan', component: () => import('pages/quick-check/NewScan.vue') },
-      {
-        path: 'select-test',
-        name: 'Select Test',
-        component: () => import('pages/quick-check/SelectOrCreate.vue'),
-      },
-      {
-        path: 'setup',
-        name: 'Setup',
-        component: () => import('pages/quick-check/SetupTest.vue'),
-      },
-    ],
-  },
-
   // Always leave this as last one,
   // but you can also remove it
   {
