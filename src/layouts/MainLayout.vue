@@ -21,7 +21,7 @@
           <q-tabs class="bg-primary text-white" indicator-color="transparent" align="justify">
             <q-route-tab exact :to="{ name: 'Dashboard' }" icon="home" />
             <q-route-tab exact :to="{ name: 'Profile' }" icon="person" />
-            <q-route-tab exact :to="{ name: 'Select Test' }" icon="manage_search" />
+            <q-route-tab exact :to="{ name: 'Recents' }" icon="manage_search" />
           </q-tabs>
         </div>
         <div class="scan-btn-wrapper">
@@ -30,7 +30,7 @@
             class="scan-btn bg-primary"
             flat
             text-color="white"
-            :to="{ name: 'Create Answer Key' }"
+            @click="scanStore.scanNow"
           />
         </div>
       </div>
@@ -43,6 +43,7 @@
 import { useQuasar } from 'quasar';
 import { Title } from 'src/components';
 import { useAuthStore } from 'src/stores/auth-store';
+import { useScanStore } from 'src/stores/scan-store';
 import { useSubjectStore } from 'src/stores/subject-store';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -50,6 +51,7 @@ import { useRoute, useRouter } from 'vue-router';
 const $q = useQuasar();
 const authStore = useAuthStore();
 const subjectStore = useSubjectStore();
+const scanStore = useScanStore();
 
 const router = useRouter();
 const route = useRoute();
