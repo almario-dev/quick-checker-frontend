@@ -1,11 +1,11 @@
 <template>
   <q-page class="q-pa-md">
     <div>
-      <h4 class="text-bold mb-6 mt-8 flex items-center gap-2">
-        <span class="wave-emoji">👋 </span>
-        <span>Hi,</span>
+      <h5 class="text-bold mb-6 mt-4 flex items-center gap-2">
+        <span class="wave-emoji">👋</span>
+        Hi,
         {{ userStore.getData?.name }}!
-      </h4>
+      </h5>
     </div>
 
     <div class="q-mt-sm q-gutter-sm">
@@ -32,13 +32,15 @@
           <div class="text-[1rem] font-[500] text-blue-grey-10">Latest check(s)</div>
         </q-card-section>
 
-        <q-card-section class="q-px-none q-py-none">
+        <q-card-section v-if="answerSheetStore.getList.length" class="q-pa-none">
           <AnswerSheets v-model:list="answerSheetStore.list" no-pagination :display-only="5" />
 
           <div class="flex justify-center" v-if="answerSheetStore.getList.length > 5">
             <q-btn label="View More" flat text-color="blue-grey-5" :to="{ name: 'Recents' }" />
           </div>
         </q-card-section>
+
+        <NoData v-else />
       </q-card>
 
       <MyAnswerKeys />
@@ -49,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { MyAnswerKeys, MySubjects } from 'src/components';
+import { MyAnswerKeys, MySubjects, NoData } from 'src/components';
 import { useScanStore } from 'src/stores/scan-store';
 import { useUserStore } from 'src/stores/user-store';
 import { AnswerSheets } from '../components';

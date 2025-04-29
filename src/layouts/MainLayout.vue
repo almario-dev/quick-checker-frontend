@@ -17,9 +17,6 @@
         <q-btn icon="more_vert" text-color="grey-8" round flat class="q-ml-auto">
           <q-menu>
             <q-list style="min-width: 100px">
-              <q-item clickable v-close-popup>
-                <q-item-section>Settings</q-item-section>
-              </q-item>
               <q-item clickable v-close-popup @click="logout">
                 <q-item-section>Logout</q-item-section>
               </q-item>
@@ -35,24 +32,64 @@
       </q-pull-to-refresh>
     </q-page-container>
 
-    <q-footer class="bg-white text-dark">
-      <div class="grid grid-rows-1 grid-cols-4 bottom-nav">
-        <div class="col-span-3">
-          <q-tabs class="bg-primary text-white" indicator-color="transparent" align="justify">
-            <q-route-tab exact :to="{ name: 'Dashboard' }" icon="home" />
-            <q-route-tab exact :to="{ name: 'Profile' }" icon="person" />
-            <q-route-tab exact :to="{ name: 'Recents' }" icon="manage_search" />
-          </q-tabs>
-        </div>
-        <div class="scan-btn-wrapper">
-          <q-btn
-            icon="document_scanner"
-            class="scan-btn bg-primary"
-            flat
-            text-color="white"
-            @click="scanStore.scanNow"
-          />
-        </div>
+    <q-footer class="bg-white text-dark" elevated>
+      <div class="flex justify-between bg-white text-primary h-[3.5rem] bottom-nav">
+        <q-btn
+          exact
+          :color="route.name === 'Dashboard' ? 'blue-grey-5' : 'primary'"
+          :to="{ name: 'Dashboard' }"
+          flat
+          icon="home"
+          class="flex-1"
+          square
+          :loading="disabled"
+          :disable="disabled"
+        />
+        <q-btn
+          exact
+          :to="{ name: 'Recents' }"
+          :color="route.name === 'Recents' ? 'blue-grey-5' : 'primary'"
+          flat
+          icon="manage_search"
+          class="flex-1"
+          square
+          :loading="disabled"
+          :disable="disabled"
+        />
+
+        <q-btn
+          icon="document_scanner"
+          class="shadow-9 scan-btn"
+          glossy
+          color="secondary"
+          text-color="white"
+          round
+          @click="scanStore.scanNow"
+          :disable="disabled"
+        />
+
+        <q-btn
+          exact
+          :to="{ name: 'Profile' }"
+          :color="route.name === 'Profile' ? 'blue-grey-5' : 'primary'"
+          flat
+          icon="person"
+          class="flex-1"
+          square
+          :loading="disabled"
+          :disable="disabled"
+        />
+        <q-btn
+          exact
+          :to="{ name: 'Profile' }"
+          :color="route.name === 'Profile' ? 'blue-grey-5' : 'primary'"
+          flat
+          icon="settings"
+          class="flex-1"
+          square
+          :loading="disabled"
+          :disable="disabled"
+        />
       </div>
     </q-footer>
   </q-layout>
@@ -68,11 +105,13 @@ import { useAnswerSheetStore } from 'src/stores/answer-sheet-store';
 import { useAuthStore } from 'src/stores/auth-store';
 import { useScanStore } from 'src/stores/scan-store';
 import { useSubjectStore } from 'src/stores/subject-store';
+import { useUserStore } from 'src/stores/user-store';
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const $q = useQuasar();
 const authStore = useAuthStore();
+const userStore = useUserStore();
 const alertStore = useAlertStore();
 const scanStore = useScanStore();
 const answerSheetStore = useAnswerSheetStore();
@@ -81,6 +120,8 @@ const subjectStore = useSubjectStore();
 
 const router = useRouter();
 const route = useRoute();
+
+const disabled = computed(() => !userStore.isAuthenticated);
 
 const pageTitle = computed(() => {
   return typeof route.name === 'string' ? route.name : String(route.name ?? '');
@@ -126,18 +167,17 @@ const back = (): void => router.go(-1);
 
 <style lang="scss">
 .bottom-nav {
-  .scan-btn-wrapper {
+  button:not(.scan-btn) {
     height: 100%;
-    position: relative;
   }
 
   .scan-btn {
-    position: absolute;
-    --size: 5rem;
-    width: 100%;
+    --size: 4.5rem;
+    z-index: 10;
+    font-size: 1rem;
+    margin-top: -2.25rem;
+    width: var(--size);
     height: var(--size);
-    bottom: 0;
-    right: 0rem;
   }
 }
 </style>

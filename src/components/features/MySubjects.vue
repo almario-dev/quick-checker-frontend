@@ -4,18 +4,20 @@
       <div class="flex items-center justify-between text-[1rem] font-[500] text-blue-grey-10">
         <span>My Subjects</span>
         <q-btn
+          v-if="subjectStore.getSubjects.length"
           color="blue-grey-11"
           text-color="primary"
           rounded
           size="sm"
           dense
           icon="add"
+          class="q-mr-sm"
           @click="dialog = true"
         />
       </div>
     </q-card-section>
 
-    <q-card-section class="q-px-none q-pt-none">
+    <q-card-section v-if="subjectStore.getSubjects.length" class="q-px-none q-pt-none">
       <div class="bg-white shadow-3 rounded-borders">
         <q-list separator>
           <q-item v-for="subject in paginatedSubjects" :key="subject.id" class="q-py-sm">
@@ -52,6 +54,10 @@
         />
       </div>
     </q-card-section>
+
+    <NoData v-else>
+      <q-btn label="Add subject" color="primary" @click="dialog = true" />
+    </NoData>
   </q-card>
 
   <SubjectDialog v-model:dialog="dialog" v-model:edit="editModel" @success="subjectStore.fetch" />
@@ -61,7 +67,7 @@
 import { useQuasar } from 'quasar';
 import type { Subject } from 'src/composables/interfaces/IApp';
 import { computed, onMounted, ref } from 'vue';
-import { SubjectDialog } from '..';
+import { NoData, SubjectDialog } from '..';
 import { useSubjectStore } from 'src/stores/subject-store';
 import { skip } from 'src/assets/utils';
 

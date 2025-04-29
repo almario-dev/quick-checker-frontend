@@ -3,6 +3,7 @@ export { default as Image } from './ImagePlaceholder.vue';
 export { default as Title } from './PageTitle.vue';
 
 export { default as CustomForm } from './FormComponent.vue';
+export { default as NoData } from './NoData.vue';
 
 // features
 export { default as MySubjects } from './features/MySubjects.vue';

@@ -4,18 +4,20 @@
       <div class="flex items-center justify-between text-[1rem] font-[500] text-blue-grey-10">
         <span>Answer Key Sources</span>
         <q-btn
+          v-if="answerKeyStore.getList.length"
           color="blue-grey-11"
           text-color="primary"
           rounded
           size="sm"
           dense
           icon="add"
+          class="q-mr-sm"
           @click="gotoCreate"
         />
       </div>
     </q-card-section>
 
-    <q-card-section class="q-px-none q-pt-none">
+    <q-card-section v-if="answerKeyStore.getList.length" class="q-pa-none">
       <div class="bg-white shadow-3 rounded-borders">
         <q-list separator>
           <q-item v-for="key in paginatedAnswerKeys" :key="key.id" class="q-py-md q-pl">
@@ -60,6 +62,10 @@
         />
       </div>
     </q-card-section>
+
+    <NoData v-else>
+      <q-btn label="Create" color="primary" @click="gotoCreate" />
+    </NoData>
   </q-card>
 </template>
 
@@ -68,7 +74,7 @@
 import { useQuasar } from 'quasar';
 import type { Subject } from 'src/composables/interfaces/IApp';
 import { computed, onMounted, ref } from 'vue';
-import { SubjectDialog } from '..';
+import { NoData, SubjectDialog } from '..';
 import { useSubjectStore } from 'src/stores/subject-store';
 import { skip } from 'src/assets/utils';
 import { useAnswerKeyStore } from 'src/stores/answer-key-store';
