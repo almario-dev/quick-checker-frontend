@@ -31,7 +31,7 @@
           <q-icon name="auto_awesome" color="cyan" v-if="!isRaw(sheet) && sheet.ai_checked" />
           {{ sheet.student_name }}
         </q-item-label>
-        <q-item-label lines="2" caption v-if="sheet.answer_key">
+        <q-item-label lines="2" caption v-if="sheet.answer_key" class="text-grey-8">
           {{ answerKeyStore.get(sheet.answer_key)?.name }}
           ({{ sheet.subject.name }})
         </q-item-label>
