@@ -2,8 +2,9 @@
   <q-page class="q-pa-md">
     <div>
       <h4 class="text-bold mb-6 mt-8 flex items-center gap-2">
-        <div class="wave-emoji">👋</div>
-        Hi {{ userStore.getData?.name }}!
+        <span class="wave-emoji">👋 </span>
+        <span>Hi,</span>
+        {{ userStore.getData?.name }}!
       </h4>
     </div>
 
@@ -34,11 +35,13 @@
         <q-card-section class="q-px-none q-py-none">
           <AnswerSheets v-model:list="answerSheetStore.list" no-pagination :display-only="5" />
 
-          <div class="flex justify-center">
+          <div class="flex justify-center" v-if="answerSheetStore.getList.length > 5">
             <q-btn label="View More" flat text-color="blue-grey-5" :to="{ name: 'Recents' }" />
           </div>
         </q-card-section>
       </q-card>
+
+      <MyAnswerKeys />
 
       <MySubjects />
     </div>
@@ -46,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { MySubjects } from 'src/components';
+import { MyAnswerKeys, MySubjects } from 'src/components';
 import { useScanStore } from 'src/stores/scan-store';
 import { useUserStore } from 'src/stores/user-store';
 import { AnswerSheets } from '../components';
