@@ -39,8 +39,15 @@ export const useAnswerSheetStore = defineStore('answer-sheet', () => {
 
   const list = ref<(AnswerSheet | AnswerSheetRawResult)[]>([]);
   const pendingIds = ref<Set<string>>(new Set());
+  const intervalId = ref<null | NodeJS.Timeout>(null);
 
   const getList = computed(() => list.value);
+
+  const cancelInterval = (): void => {
+    if (intervalId.value) {
+      clearInterval(intervalId.value);
+    }
+  };
 
   const addRaw = (data: AnswerSheetRawResult): void => {
     list.value.unshift({ ...data, status: 'raw' });
@@ -84,7 +91,9 @@ export const useAnswerSheetStore = defineStore('answer-sheet', () => {
     await runOnce('init', async (): Promise<void> => {
       await fetch();
 
-      setInterval(
+      cancelInterval();
+
+      intervalId.value = setInterval(
         () => {
           fetch().catch(skip);
         },
@@ -94,6 +103,7 @@ export const useAnswerSheetStore = defineStore('answer-sheet', () => {
   };
 
   const resetState = (): void => {
+    cancelInterval();
     cancelAll();
     list.value = [];
     pendingIds.value.clear();
@@ -110,5 +120,6 @@ export const useAnswerSheetStore = defineStore('answer-sheet', () => {
     resetAll,
     cancelAll,
     resetState,
+    cancelInterval,
   };
 });
