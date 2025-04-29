@@ -1,7 +1,11 @@
 <template>
-  <q-page class="flex column items-center justify-center">
-    <q-form class="q-gutter-y-sm" @submit.prevent="submit" autofocus>
-      <div class="text-h6">Register</div>
+  <q-page class="p-6 column items-stretch justify-center">
+    <q-form class="q-gutter-y-sm" autofocus @submit.prevent="submit">
+      <div class="text-center column mb-8 items-center justify-center">
+        <AppLogo size="md" />
+        <span class="text-[1.5rem] font-[600] text-primary">Quick Checker</span>
+        <span class="text-[1rem] text-blue-grey-8 mt-2">Register</span>
+      </div>
       <q-input v-model="form.name" label="Name" outlined lazy-rules :rules="rules.name" />
       <q-input
         v-model="form.email"
@@ -13,24 +17,45 @@
       <q-input
         v-model="form.password"
         label="Password"
-        type="password"
+        :type="showPassword ? 'text' : 'password'"
         outlined
         lazy-rules
         :rules="rules.password"
-      />
+      >
+        <template v-if="form.password || form.password_confirmation" v-slot:append>
+          <q-btn
+            :icon="showPassword ? 'visibility_off' : 'visibility'"
+            dense
+            flat
+            color="grey-6"
+            @click="showPassword = !showPassword"
+          />
+        </template>
+      </q-input>
       <q-input
         v-model="form.password_confirmation"
         label="Confirm Password"
-        type="password"
+        :type="showPassword ? 'text' : 'password'"
         outlined
         lazy-rules
         :rules="rules.password_confirmation"
-      />
+      >
+        <template v-if="form.password || form.password_confirmation" v-slot:append>
+          <q-btn
+            :icon="showPassword ? 'visibility_off' : 'visibility'"
+            dense
+            flat
+            color="grey-6"
+            @click="showPassword = !showPassword"
+          />
+        </template>
+      </q-input>
 
       <q-btn
         type="submit"
         class="full-width"
-        label="Submit"
+        padding="md"
+        label="Create account"
         color="primary"
         :loading="isSubmitting"
         :disable="isSubmitting"
@@ -47,6 +72,7 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar';
+import AppLogo from 'src/components/AppLogo.vue';
 import type { IUserRegistration } from 'src/composables/interfaces/IUser';
 import { createRules } from 'src/composables/useRules';
 import { useAuthStore } from 'src/stores/auth-store';
@@ -55,6 +81,7 @@ import { computed, reactive, ref } from 'vue';
 const $q = useQuasar();
 const authStore = useAuthStore();
 const isSubmitting = ref<boolean>(false);
+const showPassword = ref<boolean>(false);
 
 const form = reactive<IUserRegistration>({
   name: '',

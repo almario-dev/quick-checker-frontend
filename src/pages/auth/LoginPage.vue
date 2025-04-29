@@ -1,10 +1,14 @@
 <template>
-  <q-page class="flex column items-center justify-center">
-    <q-form class="q-gutter-y-sm" autofocus @submit.prevent="submit">
-      <div class="text-h6">
-        Login
-
+  <q-page class="p-6 column items-stretch justify-center">
+    <q-form
+      class="bg-white p-5 pt-0 rounded-lg shadow-6 q-gutter-y-sm"
+      autofocus
+      @submit.prevent="submit"
+    >
+      <div class="text-center column mb-8 items-center justify-center">
         <AppLogo size="md" />
+        <span class="text-[1.5rem] font-[600] text-primary">Quick Checker</span>
+        <span class="text-[1rem] text-blue-grey-8 mt-2">Login to your account</span>
       </div>
       <q-input
         v-model="form.email"
@@ -15,27 +19,39 @@
       />
       <q-input
         v-model="form.password"
+        :type="showPassword ? 'text' : 'password'"
         label="Password"
         outlined
         lazy-rules
         :rules="rules.password"
-      />
+      >
+        <template v-if="form.password" v-slot:append>
+          <q-btn
+            :icon="showPassword ? 'visibility_off' : 'visibility'"
+            flat
+            round
+            dense
+            color="grey-6"
+            @click="showPassword = !showPassword"
+          />
+        </template>
+      </q-input>
 
-      <q-btn type="submit" label="Login" color="primary" :loading="loading" :disable="loading" />
-    </q-form>
-
-    <div class="text-center q-mt-lg">
-      No account yet?
-      <br />
       <q-btn
-        label="Create new account"
-        color="secondary"
-        no-caps
-        dense
-        flat
-        :to="{ name: 'Register' }"
+        type="submit"
+        class="full-width q-mt-md"
+        padding="md"
+        label="Login"
+        color="primary"
+        :loading="loading"
+        :disable="loading"
       />
-    </div>
+
+      <div class="text-center q-mt-lg">
+        No account yet?
+        <q-btn label="Create here" color="info" no-caps dense flat :to="{ name: 'Register' }" />
+      </div>
+    </q-form>
   </q-page>
 </template>
 
@@ -52,6 +68,7 @@ const $q = useQuasar();
 const router = useRouter();
 const authStore = useAuthStore();
 const loading = ref<boolean>(false);
+const showPassword = ref<boolean>(false);
 
 const rules = {
   email: createRules({ required: true }),
