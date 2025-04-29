@@ -1,5 +1,4 @@
 import type { AxiosError } from 'axios';
-import type { AnswerSheet } from 'src/composables/interfaces/IApp';
 import type { LocalFileType } from 'src/composables/types/app';
 
 export const getErrMessage = (err: AxiosError, fallback = ''): string => {
@@ -9,10 +8,6 @@ export const getErrMessage = (err: AxiosError, fallback = ''): string => {
 
 // function to skip catch blocks
 export const skip = (): void => {};
-
-export const newAnswerSheet = (file: Blob): AnswerSheet => {
-  return { file, id: 'u' + Date.now(), name: '' };
-};
 
 export const newFileObject = (file: Blob, props: Record<string, unknown> = {}): LocalFileType => {
   return {
