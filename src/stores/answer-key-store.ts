@@ -28,7 +28,8 @@ export interface AnswerKeyBasic {
   name: string;
   subject: Subject;
   mode: AnswerKeyMode;
-  score: null | number;
+  score?: null | number;
+  scans?: number;
 }
 
 export interface AnswerKey {
