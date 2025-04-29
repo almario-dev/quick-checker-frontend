@@ -3,14 +3,22 @@
     <q-card-section class="q-px-none">
       <div class="flex items-center justify-between text-[1rem] font-[500] text-blue-grey-10">
         <span>My Subjects</span>
-        <q-btn color="accent" size="0.785rem" dense icon="add" @click="dialog = true" />
+        <q-btn
+          color="blue-grey-11"
+          text-color="primary"
+          rounded
+          size="sm"
+          dense
+          icon="add"
+          @click="dialog = true"
+        />
       </div>
     </q-card-section>
 
     <q-card-section class="q-px-none q-pt-none">
       <div class="bg-white shadow-3 rounded-borders">
         <q-list separator>
-          <q-item v-for="subject in paginatedSubjects" :key="subject.id" class="q-py-md">
+          <q-item v-for="subject in paginatedSubjects" :key="subject.id" class="q-py-sm">
             <q-item-section>
               <q-item-label lines="1" class="font-[600]">{{ subject.name }} </q-item-label>
             </q-item-section>
@@ -33,7 +41,7 @@
         </q-list>
       </div>
 
-      <div class="flex justify-center q-mt-md">
+      <div class="flex justify-center q-mt-md" v-if="paginatedSubjects.length > perPage">
         <q-pagination
           v-model="page"
           :max="maxPage"
