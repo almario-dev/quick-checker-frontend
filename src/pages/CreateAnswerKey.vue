@@ -44,7 +44,7 @@
         <Title title="Fill up basic info" dialog />
       </div>
 
-      <q-form ref="formRef" class="flex column gap-2" @submit.prevent="startAnalysis">
+      <q-form ref="formRef" class="flex column gap-1" @submit.prevent="startAnalysis">
         <q-input
           label="Name"
           outlined
@@ -90,7 +90,7 @@ import { createRules } from 'src/composables/useRules';
 import { useAnswerKeyStore } from 'src/stores/answer-key-store';
 import { useScanStore } from 'src/stores/scan-store';
 import { useSubjectStore } from 'src/stores/subject-store';
-import { computed, reactive, ref } from 'vue';
+import { computed, onBeforeMount, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const $q = useQuasar();
@@ -142,4 +142,6 @@ const emitSubmit = async (): Promise<void> => {
     await startAnalysis();
   }
 };
+
+onBeforeMount(answerKeyStore.resetModel);
 </script>
