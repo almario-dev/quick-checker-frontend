@@ -4,6 +4,7 @@ import type { Subject } from 'src/composables/interfaces/IApp';
 import { useRequestController } from 'src/composables/useRequestController';
 import { api } from 'src/boot/axios';
 import { skip } from 'src/assets/utils';
+import type { LocalFileType } from 'src/composables/types/app';
 
 export interface AnswerSheetRawResult {
   id: string;
@@ -105,6 +106,16 @@ export const useAnswerSheetStore = defineStore('answer-sheet', () => {
     });
   };
 
+  const getDocuments = async (id: number): Promise<LocalFileType[] | void> => {
+    return await send('get-documents', async (): Promise<LocalFileType[] | void> => {
+      const { data } = await api.get(`answer-sheets/${id}/info`);
+
+      if (!data.documents) return;
+
+      return data.documents;
+    });
+  };
+
   const resetState = (): void => {
     cancelInterval();
     cancelAll();
@@ -123,6 +134,7 @@ export const useAnswerSheetStore = defineStore('answer-sheet', () => {
     reset,
     resetAll,
     cancelAll,
+    getDocuments,
     resetState,
     cancelInterval,
   };

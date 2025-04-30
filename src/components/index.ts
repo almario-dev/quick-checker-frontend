@@ -15,3 +15,4 @@ export { default as MyAnswerKeys } from './features/MyAnswerKeys.vue';
 export { default as SubjectDialog } from './dialogs/SubjectFormDialog.vue';
 export { default as Preview } from './dialogs/SnapshopPreview.vue';
 export { default as SelectAnswerKey } from './dialogs/SelectAnswerKey.vue';
+export { default as ViewSheet } from './dialogs/ViewAnswerSheet.vue';

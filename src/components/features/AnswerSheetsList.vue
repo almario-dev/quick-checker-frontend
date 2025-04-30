@@ -6,6 +6,7 @@
       class="bg-white shadow-3 rounded-borders relative q-py-md"
       clickable
       v-ripple
+      @click="viewAnswerSheet(sheet)"
     >
       <div v-if="isRaw(sheet) && sheet.status === 'raw'" class="absolute bottom-0 right-0 left-0">
         <q-linear-progress indeterminate color="warning" size="xs" />
@@ -65,6 +66,8 @@
       color="grey-7"
     />
   </div>
+
+  <ViewSheet v-model:dialog="viewSheetProps.dialog" v-model:sheet="viewSheetProps.sheet" />
 </template>
 
 <script setup lang="ts">
@@ -76,6 +79,7 @@ import {
   isRaw,
 } from 'src/stores/answer-sheet-store';
 import { computed, ref } from 'vue';
+import { ViewSheet } from '..';
 
 const answerKeyStore = useAnswerKeyStore();
 
@@ -99,6 +103,10 @@ const emit = defineEmits<{
 }>();
 
 const page = ref(1);
+const viewSheetProps = ref({
+  dialog: false as boolean,
+  sheet: null as AnswerSheet | AnswerSheetRawResult | null,
+});
 
 const listModel = computed({
   get: () => props.list,
@@ -137,4 +145,9 @@ const paginatedList = computed(() => {
   const end = start + props.perPage;
   return computedList.value.slice(start, end);
 });
+
+const viewAnswerSheet = (sheet: AnswerSheetRawResult | AnswerSheet): void => {
+  viewSheetProps.value.sheet = sheet;
+  viewSheetProps.value.dialog = true;
+};
 </script>

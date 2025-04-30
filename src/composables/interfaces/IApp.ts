@@ -18,3 +18,8 @@ export interface ChangePassword {
   password: string;
   password_confirmation: string;
 }
+
+export interface FileUpload {
+  id: number;
+  path: string;
+}

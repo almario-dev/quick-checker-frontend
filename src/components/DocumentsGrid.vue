@@ -9,15 +9,20 @@
     </div>
 
     <div
-      v-for="({ file, id }, i) in documentsModel ?? []"
+      v-for="(doc, i) in documentsModel ?? []"
       :key="i"
       class="h-[5rem] shadow-3 rounded-borders overflow-hidden relative"
       v-ripple
-      @click="openPreview(file)"
+      @click="openPreview((doc as FileUpload).path || (doc as LocalFileType).file)"
     >
-      <q-img :src="blobToImageUrl(file)" no-native-menu height="100%">
+      <q-img
+        :src="(doc as FileUpload).path || blobToImageUrl((doc as LocalFileType).file)"
+        no-native-menu
+        height="100%"
+      >
         <div class="absolute-full flex flex-center"></div>
         <q-btn
+          v-if="(doc as LocalFileType).file"
           icon="close"
           size="xs"
           round
@@ -26,7 +31,7 @@
           color="grey-6"
           unelevated
           v-ripple.stop
-          @click="remove(id)"
+          @click="remove((doc as LocalFileType).id)"
         />
       </q-img>
     </div>
@@ -43,12 +48,13 @@ import type { LocalFileType } from 'src/composables/types/app';
 import { blobToImageUrl } from 'src/composables/useCamera';
 import { computed, reactive } from 'vue';
 import { Preview } from '.';
+import type { FileUpload } from 'src/composables/interfaces/IApp';
 
 const $q = useQuasar();
 
 const props = withDefaults(
   defineProps<{
-    documents: LocalFileType[] | null;
+    documents: LocalFileType[] | FileUpload[] | null;
     usePlaceholder?: boolean;
   }>(),
   {
@@ -58,7 +64,7 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (e: 'update:documents', value: LocalFileType[] | null): void;
+  (e: 'update:documents', value: LocalFileType[] | FileUpload[] | null): void;
   (e: 'remove', value: string): void;
 }>();
 
@@ -83,8 +89,13 @@ const remove = (id: string): void => {
   }).onOk(() => emit('remove', id));
 };
 
-const openPreview = (file: Blob): void => {
-  previewModel.image = blobToImageUrl(file);
+const openPreview = (file: Blob | string): void => {
+  if (typeof file === 'string') {
+    previewModel.image = file;
+  } else if (file instanceof Blob) {
+    previewModel.image = blobToImageUrl(file);
+  }
+
   previewModel.dialog = true;
 };
 </script>
