@@ -40,6 +40,7 @@ export const useAnswerSheetStore = defineStore('answer-sheet', () => {
   const list = ref<(AnswerSheet | AnswerSheetRawResult)[]>([]);
   const pendingIds = ref<Set<string>>(new Set());
   const intervalId = ref<null | NodeJS.Timeout>(null);
+  const isActive = ref<boolean>(true);
 
   const getList = computed(() => list.value);
 
@@ -95,6 +96,8 @@ export const useAnswerSheetStore = defineStore('answer-sheet', () => {
 
       intervalId.value = setInterval(
         () => {
+          if (!isActive.value) return;
+
           fetch().catch(skip);
         },
         1000 * 60 * 5, // 5 minutes
@@ -110,6 +113,7 @@ export const useAnswerSheetStore = defineStore('answer-sheet', () => {
   };
 
   return {
+    isActive,
     list,
     getList,
     addRaw,

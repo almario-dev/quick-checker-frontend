@@ -8,6 +8,7 @@ import { useSubjectStore } from './stores/subject-store';
 import { useAnswerKeyStore } from './stores/answer-key-store';
 import { useAnswerSheetStore } from './stores/answer-sheet-store';
 import { useUserStore } from './stores/user-store';
+import { App } from '@capacitor/app';
 
 const answerSheetStore = useAnswerSheetStore();
 const answerKeyStore = useAnswerKeyStore();
@@ -20,7 +21,7 @@ watch(
     if (!isAuth) return;
 
     try {
-      await Promise.all([
+      await Promise.allSettled([
         //
         subjectStore.init(),
         answerKeyStore.fetch(),
@@ -31,4 +32,10 @@ watch(
     }
   },
 );
+
+const onAppStateChange = ({ isActive }: { isActive: boolean }) => {
+  answerSheetStore.isActive = isActive;
+};
+
+void App.addListener('appStateChange', onAppStateChange);
 </script>
