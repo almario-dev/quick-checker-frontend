@@ -54,7 +54,7 @@
     </q-item>
   </q-list>
 
-  <div class="flex justify-center q-mt-md">
+  <div class="flex justify-center q-mt-md" v-if="computedList.length > (perPage ?? 15)">
     <q-pagination
       v-if="!noPagination"
       v-model="page"
