@@ -81,8 +81,8 @@
         />
         <q-btn
           exact
-          :to="{ name: 'Profile' }"
-          :color="route.name === 'Profile' ? 'blue-grey-5' : 'primary'"
+          :to="{ name: 'Settings' }"
+          :color="route.name === 'Settings' ? 'blue-grey-5' : 'primary'"
           flat
           icon="settings"
           class="flex-1"

@@ -1,3 +1,4 @@
+import { type IndeterminateData } from './../composables/types/app';
 import type { IUserLogin, IUserRegistration } from './../composables/interfaces/IUser';
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/axios';
@@ -5,6 +6,11 @@ import type { AuthToken, UserData } from 'src/composables/types/auth';
 import { computed, ref } from 'vue';
 import { useUserStore } from './user-store';
 import type { AxiosResponse } from 'axios';
+
+interface UserRes {
+  user: Record<string, string>;
+  config: Record<string, IndeterminateData>;
+}
 
 export const useAuthStore = defineStore(
   'auth',
@@ -18,8 +24,8 @@ export const useAuthStore = defineStore(
       token.value = newToken;
     };
 
-    const hydrateUserData = (data: Record<string, string>) => {
-      const { name, email, role } = data;
+    const hydrateUserData = (data: UserRes) => {
+      const { name, email, role } = data.user;
 
       if (!name || !email || !role) {
         throw new Error('Incorrect definition of data');
@@ -30,6 +36,14 @@ export const useAuthStore = defineStore(
       }
 
       userStore.setData({ name, email, role });
+
+      if (data.config) {
+        const { similarity_threshold } = data.config;
+
+        if (similarity_threshold) {
+          userStore.settings.similarity_threshold = Number(similarity_threshold) || 75;
+        }
+      }
     };
 
     const extractTokenResource = (response: AxiosResponse) => {
@@ -103,6 +117,7 @@ export const useAuthStore = defineStore(
           .then(() => {
             setToken(null);
             userStore.setData(null);
+            userStore.settings.similarity_threshold = 75;
             resolve();
           })
           .catch((err) => {
