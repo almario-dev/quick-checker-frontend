@@ -13,7 +13,7 @@
     "update-version": "node update-version.js",
     "dev": "quasar dev",
     "build": "quasar build",
-    "build:android": "npm run update-version && quasar build -m capacitor -T android --prod",
+    "build:android": "move .env.local .env.local.bak && npm run update-version && quasar build -m capacitor -T android --prod && move .env.local.bak .env.local",
     "postinstall": "quasar prepare"
   },
   "dependencies": {
