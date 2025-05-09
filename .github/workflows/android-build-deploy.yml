@@ -24,6 +24,10 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Create .env.production file
+        run: |
+          echo "VITE_API=${{ secrets.HOST_URL }}" > .env.production
+
       - name: Prepare signing config
         run: |
           mkdir -p src-capacitor/android/app
