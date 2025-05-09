@@ -1,61 +1,13 @@
+import { Platform } from 'quasar';
+import { computed } from 'vue';
 import type { RouteRecordRaw } from 'vue-router';
+import mobileRoutes from './mobile-routes';
+import webRoutes from './web-routes';
+
+const notMobile = computed(() => !Platform.is.nativeMobileWrapper);
 
 const routes: RouteRecordRaw[] = [
-  // guest
-  {
-    path: '/',
-    redirect: { name: 'Login' },
-    meta: { guestOnly: true },
-    name: 'Guest',
-    component: () => import('layouts/AuthLayout.vue'),
-    children: [
-      // auth
-      { path: 'login', name: 'Login', component: () => import('pages/auth/LoginPage.vue') },
-      {
-        path: 'register',
-        name: 'Register',
-        component: () => import('pages/auth/RegisterPage.vue'),
-      },
-    ],
-  },
-
-  // authenticated-user
-  {
-    path: '/',
-    redirect: { name: 'Dashboard' },
-    meta: { requireAuth: true },
-    name: 'Auth',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      // auth
-      { path: '', name: 'Dashboard', component: () => import('pages/DashboardPage.vue') },
-      { path: 'account', name: 'Profile', component: () => import('pages/AccountPage.vue') },
-      { path: 'recents', name: 'Recents', component: () => import('pages/RecentsPage.vue') },
-      { path: 'settings', name: 'Settings', component: () => import('pages/SettingsPage.vue') },
-    ],
-  },
-
-  // app
-  {
-    path: '/',
-    redirect: { name: 'Create Answer Key' },
-    meta: { requireAuth: true },
-    name: 'App',
-    component: () => import('layouts/FullScreenLayout.vue'),
-    children: [
-      // ...
-      {
-        path: 'create-answer-key',
-        name: 'Create Answer Key',
-        component: () => import('pages/CreateAnswerKey.vue'),
-      },
-      {
-        path: 'scan-answer-sheets',
-        name: 'Scan Answer Sheets',
-        component: () => import('pages/ScanAnswerSheets.vue'),
-      },
-    ],
-  },
+  ...(notMobile.value ? webRoutes : mobileRoutes),
 
   // Always leave this as last one,
   // but you can also remove it
