@@ -1,0 +1,106 @@
+name: Main CI/CD Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Quasar CLI globally
+        run: npm install -g @quasar/cli
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      # - name: Run tests
+      #   run: npm run test
+
+      - name: Build the app
+        env:
+          VITE_API: ${{ secrets.HOST_URL }}
+
+        run: |
+          echo "Building the Quasar app with production environment variables..."
+          quasar build
+
+      - name: Upload production-ready files
+        uses: actions/upload-artifact@v4
+        with:
+          name: vue-build
+          path: dist/spa/
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: vue-build
+          path: dist/spa/
+
+      - name: Setup SSH key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_USER: ${{ secrets.HOSTING_USER }}
+          SSH_HOST: ${{ secrets.HOSTING_HOST }}
+          SSH_PORT: ${{ secrets.HOSTING_PORT }}
+        run: |
+          echo "Setting up SSH key..."
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo "SSH private key setup completed."
+
+          echo "Scanning host key..."
+          if ! ssh-keyscan -p $SSH_PORT -H $SSH_HOST >> ~/.ssh/known_hosts; then
+            echo "Failed to scan host key"
+            exit 1
+          fi
+          echo "Host key scan completed."
+
+      - name: Test SSH Connectivity
+        env:
+          SSH_USER: ${{ secrets.HOSTING_USER }}
+          SSH_HOST: ${{ secrets.HOSTING_HOST }}
+          SSH_PORT: ${{ secrets.HOSTING_PORT }}
+          SSH_PATH: ${{ secrets.HOSTING_PATH }}
+        run: |
+          echo "SSH_USER: $SSH_USER"
+          echo "SSH_HOST: $SSH_HOST"
+          echo "SSH_PORT: $SSH_PORT"
+          ssh -o StrictHostKeyChecking=no -p $SSH_PORT $SSH_USER@$SSH_HOST echo "SSH connection successful"
+
+      - name: Deploy build files with rsync
+        env:
+          SSH_USER: ${{ secrets.HOSTING_USER }}
+          SSH_HOST: ${{ secrets.HOSTING_HOST }}
+          SSH_PORT: ${{ secrets.HOSTING_PORT }}
+        run: |
+          rsync -avz --delete \
+            --exclude='.htaccess' \
+            --exclude='releases/' \
+            -e "ssh -p $SSH_PORT -i ~/.ssh/id_rsa" \
+            dist/spa/ $SSH_USER@$SSH_HOST:$SSH_PATH
