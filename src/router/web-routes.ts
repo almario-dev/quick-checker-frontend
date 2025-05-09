@@ -10,9 +10,9 @@ const webRoutes: RouteRecordRaw[] = [
       // auth
       { path: '', name: 'Landing', component: () => import('pages/LandingPage.vue') },
       {
-        path: 'register',
+        path: 'login',
         name: 'Admin Login',
-        component: () => import('pages/auth/RegisterPage.vue'),
+        component: () => import('pages/auth/AdminLoginPage.vue'),
       },
     ],
   },

@@ -61,11 +61,7 @@
 
         <!-- Right Section (Image) -->
         <div class="w-full lg:w-2/5 text-center relative z-10">
-          <img
-            src="src/assets/ui1.png"
-            alt="hero-image"
-            class="w-64 mx-auto rounded-3xl bg-white p-2"
-          />
+          <img :src="UI1" alt="hero-image" class="w-64 mx-auto rounded-3xl bg-white p-2" />
           <!-- Background circles -->
           <span
             class="absolute -z-1 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] bg-white/25 dark:bg-dark/25 shadow-shape-1 rounded-full"
@@ -81,6 +77,7 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar';
+import UI1 from 'src/assets/ui1.png';
 
 const $q = useQuasar();
 </script>
