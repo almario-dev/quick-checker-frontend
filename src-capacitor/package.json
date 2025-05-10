@@ -1,6 +1,6 @@
 {
   "name": "quick-checker-app",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A Quasar project for Quick Checker aApp",
   "author": "Almario Miano <almariomiano@gmail.com>",
   "private": true,
