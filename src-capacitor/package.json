@@ -1,7 +1,7 @@
 {
   "name": "quick-checker-app",
-  "version": "0.0.2",
-  "description": "A Quasar project for Quick Checker aApp",
+  "version": "0.0.3",
+  "description": "Instantly scan and check test papers with AI precision. Fast, accurate, and built for educators.",
   "author": "Almario Miano <almariomiano@gmail.com>",
   "private": true,
   "dependencies": {
