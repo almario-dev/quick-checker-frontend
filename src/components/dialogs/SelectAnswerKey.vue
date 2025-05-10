@@ -28,7 +28,7 @@
           >
             <q-item-section avatar class="q-pa-none">
               <q-avatar rounded size="3rem" color="grey-11">
-                <q-img src="src/assets/test.png" width="50%" />
+                <q-img :src="TestPng" width="50%" />
               </q-avatar>
             </q-item-section>
 
@@ -65,6 +65,7 @@ import { Title } from '..';
 import type { Subject } from 'src/composables/interfaces/IApp';
 import { type AnswerKey, useAnswerKeyStore } from 'src/stores/answer-key-store';
 import { useAlertStore } from 'src/stores/alert-store';
+import { TestPng } from '../images';
 
 const alertStore = useAlertStore();
 const answerKeyStore = useAnswerKeyStore();

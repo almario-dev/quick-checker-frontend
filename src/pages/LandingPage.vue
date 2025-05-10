@@ -77,7 +77,7 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar';
-import UI1 from 'src/assets/ui1.png';
+import { UI1 } from 'src/components/images';
 
 const $q = useQuasar();
 </script>

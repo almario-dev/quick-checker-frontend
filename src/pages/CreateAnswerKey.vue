@@ -1,7 +1,7 @@
 <template>
   <q-page>
     <div class="column items-center mt-6 gap-6 mb-6">
-      <q-img src="src/assets/svg/add-files.svg" style="max-width: 45%" />
+      <q-img :src="AddFilesSvg" style="max-width: 45%" />
       <h6 class="text-blue-grey-8 text-weight-regular">Create Answer Key</h6>
     </div>
 
@@ -32,7 +32,7 @@
           <div class="border-dashed border-gray-400 border-2 rounded-lg shadow-3 h-[5rem]">
             <q-btn color="grey-6" class="full-width full-height" flat @click="scan">
               <div class="flex column items-center justify-center">
-                <q-img src="src/assets/camera.png" width="2rem" />
+                <q-img :src="CameraPng" width="2rem" />
                 <small>scan</small>
               </div>
             </q-btn>
@@ -85,6 +85,7 @@
 import { useQuasar } from 'quasar';
 import { newFileObject, skip } from 'src/assets/utils';
 import { DocumentsGrid, Preview, Title } from 'src/components';
+import { AddFilesSvg, CameraPng } from 'src/components/images';
 import { takePicture } from 'src/composables/useCamera';
 import { createRules } from 'src/composables/useRules';
 import { useAnswerKeyStore } from 'src/stores/answer-key-store';

@@ -4,7 +4,7 @@
       v-if="usePlaceholder && !hasDocuments"
       class="col-span-3 overflow-hidden my-2 text-center relative column gap-4"
     >
-      <q-img src="src/assets/svg/empty.svg" height="5rem" fit="contain" />
+      <q-img :src="EmptySvg" height="5rem" fit="contain" />
       <span class="text-grey-6 font-[400] text-[1rem]">No Documents Available</span>
     </div>
 
@@ -49,6 +49,7 @@ import { blobToImageUrl } from 'src/composables/useCamera';
 import { computed, reactive } from 'vue';
 import { Preview } from '.';
 import type { FileUpload } from 'src/composables/interfaces/IApp';
+import { EmptySvg } from './images';
 
 const $q = useQuasar();
 

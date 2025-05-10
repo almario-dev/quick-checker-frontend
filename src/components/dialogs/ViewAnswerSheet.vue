@@ -3,7 +3,7 @@
     <q-card>
       <q-card-section v-if="sheet" class="flex justify-center q-py-lg">
         <div class="">
-          <q-img src="src/assets/error-img.jpg" />
+          <q-img :src="ErrorImgSvg" />
         </div>
         <!-- <q-avatar v-else-if="!isRaw(sheet)" rounded size="3rem" font-size="2rem">
           <q-icon name="priority_high" color="red-7" />
@@ -34,14 +34,13 @@
 import { computed, ref, watch } from 'vue';
 import { DocumentsGrid, Title } from '..';
 import {
-  // isChecked,
-  // isRaw,
   useAnswerSheetStore,
   type AnswerSheet,
   type AnswerSheetRawResult,
 } from 'src/stores/answer-sheet-store';
 import { useAnswerKeyStore } from 'src/stores/answer-key-store';
 import type { LocalFileType } from 'src/composables/types/app';
+import { ErrorImgSvg } from '../images';
 
 const answerKeyStore = useAnswerKeyStore();
 const answerSheetStore = useAnswerSheetStore();

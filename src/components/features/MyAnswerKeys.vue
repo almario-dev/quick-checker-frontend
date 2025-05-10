@@ -23,7 +23,7 @@
           <q-item v-for="key in paginatedAnswerKeys" :key="key.id" class="q-py-md q-pl">
             <q-item-section avatar class="q-pr-sm">
               <q-avatar size="2.5rem" color="grey-11">
-                <q-img src="src/assets/test.png" width="60%" />
+                <q-img :src="TestPng" width="60%" />
               </q-avatar>
             </q-item-section>
 
@@ -79,6 +79,7 @@ import { useSubjectStore } from 'src/stores/subject-store';
 import { skip } from 'src/assets/utils';
 import { useAnswerKeyStore } from 'src/stores/answer-key-store';
 import { useRouter } from 'vue-router';
+import { TestPng } from '../images';
 
 const $q = useQuasar();
 const subjectStore = useSubjectStore();

@@ -3,7 +3,7 @@
     <div class="border-dashed border-gray-400 border-2 rounded-lg shadow-5">
       <q-btn color="grey-6" class="full-width full-height" flat @click="scan">
         <div class="column items-center gap-2 py-4">
-          <q-img src="src/assets/scanning.png" width="5rem" />
+          <q-img :src="ScanningPng" width="5rem" />
           <span class="text-grey-6 text-weight-medium text-[1rem]">Scan Answer Sheets</span>
         </div>
       </q-btn>
@@ -33,7 +33,7 @@
     <q-item v-if="!scanStore.aiCheck" class="q-pl-sm rounded-borders shadow-2" clickable v-ripple>
       <q-item-section avatar class="q-pr-sm">
         <q-avatar v-if="scanStore.hasAnswerKey" rounded size="3.5rem" color="grey-11">
-          <q-img src="src/assets/test.png" width="50%" />
+          <q-img :src="TestPng" width="50%" />
         </q-avatar>
         <q-avatar v-else rounded size="3.5rem" icon="question_mark" text-color="negative" />
       </q-item-section>
@@ -124,6 +124,7 @@
 import { useQuasar } from 'quasar';
 import { newFileObject } from 'src/assets/utils';
 import { DocumentsGrid, SelectAnswerKey, Title } from 'src/components';
+import { ScanningPng, TestPng } from 'src/components/images';
 import { takePicture } from 'src/composables/useCamera';
 import { createRules } from 'src/composables/useRules';
 import { useScanStore } from 'src/stores/scan-store';
