@@ -1,58 +1,11 @@
 <template>
   <q-list class="q-gutter-y-md" v-bind="$attrs">
-    <q-item
+    <SheetItem
       v-for="sheet in paginatedList"
       :key="sheet.id"
-      class="bg-white shadow-3 rounded-borders relative q-py-md"
-      clickable
-      v-ripple
-      @click="viewAnswerSheet(sheet)"
-    >
-      <div v-if="isRaw(sheet) && sheet.status === 'raw'" class="absolute bottom-0 right-0 left-0">
-        <q-linear-progress indeterminate color="warning" size="xs" />
-      </div>
-
-      <q-item-section avatar>
-        <q-avatar rounded size="2.8rem">
-          <span v-if="isChecked(sheet)" class="text-center text-wrap">
-            <span class="">89</span>
-            <small style="font-size: 0.75rem"> / 100</small>
-          </span>
-
-          <q-icon v-else-if="!isRaw(sheet)" name="error" color="red-7" />
-
-          <q-spinner-dots v-else color="secondary" size="1.5em" />
-        </q-avatar>
-
-        <q-linear-progress v-if="isChecked(sheet)" :value="0.1" color="secondary" size="xs" />
-      </q-item-section>
-
-      <q-item-section>
-        <q-item-label lines="1" class="font-[500] text-[1rem] flex items-center gap-1">
-          <q-icon name="auto_awesome" color="cyan" v-if="!isRaw(sheet) && sheet.ai_checked" />
-          {{ sheet.student_name }}
-        </q-item-label>
-        <q-item-label lines="2" caption v-if="sheet.answer_key" class="text-grey-8">
-          {{ answerKeyStore.get(sheet.answer_key)?.name }}
-          ({{ sheet.subject.name }})
-        </q-item-label>
-        <q-item-label
-          lines="1"
-          caption
-          class="flex gap-2"
-          v-if="!isRaw(sheet) && !sheet.answer_key && sheet.ai_checked"
-        >
-          <span>{{ sheet.subject.name }} </span>
-        </q-item-label>
-      </q-item-section>
-
-      <q-item-section side>
-        <q-item-label caption class="text-italic text-center">
-          <span v-if="!isRaw(sheet)">{{ sheet.created_at }}</span>
-          <span v-else>just now</span>
-        </q-item-label>
-      </q-item-section>
-    </q-item>
+      :sheet="sheet"
+      @select="viewAnswerSheet"
+    />
   </q-list>
 
   <div class="flex justify-center q-mt-md" v-if="computedList.length > (perPage ?? 15)">
@@ -71,17 +24,9 @@
 </template>
 
 <script setup lang="ts">
-import { useAnswerKeyStore } from 'src/stores/answer-key-store';
-import {
-  type AnswerSheet,
-  type AnswerSheetRawResult,
-  isChecked,
-  isRaw,
-} from 'src/stores/answer-sheet-store';
+import { type AnswerSheet, type AnswerSheetRawResult } from 'src/stores/answer-sheet-store';
 import { computed, ref } from 'vue';
-import { ViewSheet } from '..';
-
-const answerKeyStore = useAnswerKeyStore();
+import { SheetItem, ViewSheet } from '..';
 
 const props = withDefaults(
   defineProps<{

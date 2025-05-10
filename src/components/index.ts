@@ -5,6 +5,8 @@ export { default as Title } from './PageTitle.vue';
 export { default as CustomForm } from './FormComponent.vue';
 export { default as NoData } from './NoData.vue';
 
+export { default as SheetItem } from './items/AnswerSheetItem.vue';
+
 // features
 export { default as MySubjects } from './features/MySubjects.vue';
 export { default as DocumentsGrid } from './DocumentsGrid.vue';
