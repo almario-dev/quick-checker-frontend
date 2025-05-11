@@ -72,13 +72,16 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar';
+import { skip } from 'src/assets/utils';
 import AppLogo from 'src/components/AppLogo.vue';
 import type { IUserRegistration } from 'src/composables/interfaces/IUser';
 import { createRules } from 'src/composables/useRules';
 import { useAuthStore } from 'src/stores/auth-store';
 import { computed, reactive, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const $q = useQuasar();
+const router = useRouter();
 const authStore = useAuthStore();
 const isSubmitting = ref<boolean>(false);
 const showPassword = ref<boolean>(false);
@@ -113,6 +116,8 @@ const submit = (): void => {
   authStore
     .register(form)
     .then(() => {
+      router.push({ name: 'Dashboard' }).catch(skip);
+
       $q.notify({ type: 'positive', message: 'You have successfully created an account!' });
       resetForm();
     })

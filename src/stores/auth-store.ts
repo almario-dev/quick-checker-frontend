@@ -51,17 +51,18 @@ export const useAuthStore = defineStore(
       setToken(resource);
     };
 
-    const register = (user: IUserRegistration): Promise<void> => {
+    const register = (user: IUserRegistration): Promise<UserData> => {
       return new Promise((resolve, reject): void => {
         api
           .post('register', user)
-          .then((response) => {
-            if (response.status !== 201) {
-              // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
-              return reject(response);
-            }
+          .then((response: AxiosResponse) => {
+            // get token from headers
+            extractTokenResource(response);
 
-            resolve();
+            // save user data
+            hydrateUserData(response.data);
+
+            resolve(userStore.getData);
           })
           .catch((err) => {
             // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
