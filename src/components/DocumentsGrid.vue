@@ -18,6 +18,7 @@
       <q-img :src="doc.blob ? blobToImageUrl(doc.blob) : doc.path" no-native-menu height="100%">
         <div class="absolute-full flex flex-center"></div>
         <q-btn
+          v-if="!loading"
           icon="close"
           size="xs"
           round
@@ -51,9 +52,11 @@ const props = withDefaults(
   defineProps<{
     documents: FileType[];
     usePlaceholder?: boolean;
+    loading?: boolean;
   }>(),
   {
     usePlaceholder: false,
+    loading: false,
   },
 );
 

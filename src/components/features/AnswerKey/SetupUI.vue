@@ -30,10 +30,20 @@
       />
     </div>
 
-    <DocumentsGrid v-if="!loading" v-model:documents="model.documents" @remove="removeDocument">
+    <DocumentsGrid
+      :loading="!!loading"
+      v-model:documents="model.documents"
+      @remove="removeDocument"
+    >
       <template v-slot:after>
         <div class="border-dashed border-gray-400 border-2 rounded-lg shadow-3 h-[5rem]">
-          <q-btn color="grey-6" class="full-width full-height" flat @click="scan">
+          <q-btn
+            :disable="loading"
+            color="grey-6"
+            class="full-width full-height"
+            flat
+            @click="scan"
+          >
             <div class="flex column items-center justify-center">
               <q-img :src="CameraPng" width="2rem" />
               <small>scan</small>
@@ -42,7 +52,6 @@
         </div>
       </template>
     </DocumentsGrid>
-    <p v-else class="text-center text-grey-7 text-italic">Loading...</p>
 
     <q-form ref="formRef" class="flex column gap-1" @submit.prevent="onSubmit">
       <div class="mb-1 mt-6">
