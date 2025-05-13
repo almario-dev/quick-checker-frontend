@@ -9,14 +9,13 @@
 </template>
 
 <script setup lang="ts">
-import { useQuasar } from 'quasar';
-import { skip } from 'src/assets/utils';
 import { AnswerKeySetup } from 'src/components';
+import { useAlertStore } from 'src/stores/alert-store';
 import { useAnswerKeyStore2 } from 'src/stores/answer-key';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-const $q = useQuasar();
+const alertStore = useAlertStore();
 const answerKeyStore = useAnswerKeyStore2();
 const loading = ref<boolean>(false);
 const router = useRouter();
@@ -30,13 +29,10 @@ const startAnalysis = async (): Promise<void> => {
 
   if (!result) return;
 
-  $q.dialog({
-    title: 'Analyzed!',
-    message: 'Answer key has been successfully created. Do you wish to proceed to checking?',
-    cancel: true,
-    ok: 'Proceed',
-  }).onOk(() => {
-    router.push({ name: 'Scan Answer Sheets' }).catch(skip);
-  });
+  answerKeyStore.buffer = result;
+
+  alertStore.Swap({ type: 'positive', message: 'Review analysis data' });
+
+  await router.push({ name: 'Answer Key Details', params: { id: result.id } });
 };
 </script>
