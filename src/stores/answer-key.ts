@@ -41,6 +41,7 @@ export const useAnswerKeyStore2 = defineStore('answer-key-2', () => {
   const alertStore = useAlertStore();
 
   const list = ref([] as AnswerKey[]);
+  const buffer = ref<AnswerKey | null>(null);
 
   const getAnswerKeys = computed(() => list.value);
 
@@ -113,7 +114,7 @@ export const useAnswerKeyStore2 = defineStore('answer-key-2', () => {
 
           list.value.push(data.basic);
 
-          return data;
+          return data.full;
         } catch (err) {
           if (err instanceof AxiosError) {
             alertStore.Swap({
@@ -143,6 +144,10 @@ export const useAnswerKeyStore2 = defineStore('answer-key-2', () => {
       async (): Promise<AnswerKey | void> => {
         try {
           const { data } = await api.put('answer-keys/' + id);
+
+          // update list
+          list.value = list.value.map((i) => (i.id == id ? { ...i, ...data } : i));
+
           return data;
         } catch (err) {
           console.error(err);
@@ -218,6 +223,7 @@ export const useAnswerKeyStore2 = defineStore('answer-key-2', () => {
     list,
     getAnswerKeys,
     preparationForm,
+    buffer,
     resetPreparationForm,
     removePreparationDocument,
     fetch,

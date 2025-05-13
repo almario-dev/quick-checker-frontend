@@ -59,7 +59,7 @@
                 <q-input
                   lazy-rules
                   :rules="createRules({ required: true })"
-                  v-model="item.description"
+                  v-model="item.item_description"
                   label="Description"
                   type="textarea"
                   autogrow
@@ -72,6 +72,7 @@
                   filled
                   v-model="item.key"
                   label="Answer Key"
+                  autogrow
                   dense
                 />
 
@@ -191,9 +192,23 @@ onBeforeMount(async () => {
 
   if (id) {
     try {
-      loading.value = true;
+      if (answerKeyStore.buffer?.id == id) {
+        // populate temp data
+        model.value = {
+          ...model.value,
+          ...answerKeyStore.buffer,
+        };
+      } else {
+        loading.value = true;
+      }
 
       const data = await answerKeyStore.fetchFullDetails(id);
+
+      if (!data) {
+        return;
+      }
+
+      answerKeyStore.buffer = data; // store for the next visit
 
       model.value = {
         ...model.value,
@@ -256,13 +271,18 @@ const reRunAnalysis = () => {
     cancel: true,
     ok: 'Yes',
   }).onOk(() => {
+    loading.value = true;
+
     answerKeyStore
       .reanalyze(props.id)
       .then((data) => {
         model.value = { ...model.value, ...data };
         alertStore.Swap({ type: 'positive', message: 'Analysis has been successful.' });
       })
-      .catch(skip);
+      .catch(skip)
+      .finally(() => {
+        loading.value = false;
+      });
   });
 };
 </script>
