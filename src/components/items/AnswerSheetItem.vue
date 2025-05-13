@@ -5,55 +5,49 @@
     v-ripple
     @click="emit('select', sheet)"
   >
-    <div
-      v-if="raw && (sheet as AnswerSheetRawResult).status === 'raw'"
-      class="absolute bottom-0 right-0 left-0"
-    >
+    <div v-if="rawSheet.isRaw" class="absolute bottom-0 right-0 left-0">
       <q-linear-progress indeterminate color="warning" size="xs" />
     </div>
 
     <q-item-section avatar>
       <q-avatar rounded size="2.8rem">
-        <span v-if="checked" class="text-center text-wrap">
+        <q-icon v-if="isFailed" name="error" color="red-7" />
+
+        <!-- template -->
+        <span v-else-if="score !== null" class="text-center text-wrap">
           <span class="">{{ score }}</span>
           <small style="font-size: 0.75rem"> / {{ answerKey?.score }} </small>
         </span>
 
-        <q-icon v-else-if="!raw" name="error" color="red-7" />
-
-        <q-spinner-dots v-else color="secondary" size="1.5em" />
+        <q-spinner-dots v-if="rawSheet.isRaw" color="secondary" size="1.5em" />
       </q-avatar>
 
       <q-linear-progress
-        v-if="checked"
-        :value="score / (answerKey?.score ?? 1)"
+        v-if="score !== null"
+        :value="(score ?? 0) / (answerKey?.score ?? 1)"
         color="secondary"
         size="xs"
       />
     </q-item-section>
 
-    <q-item-section>
+    <q-item-section v-if="answerKey">
       <q-item-label lines="1" class="font-[500] text-[1rem] flex items-center gap-1">
-        <q-icon name="auto_awesome" color="cyan" v-if="!raw && evalSheet.ai_checked" />
-        {{ sheet.student_name }}
+        <q-icon name="auto_awesome" color="cyan" v-if="evalSheet.aiChecked" />
+        {{ sheet.studentName }}
       </q-item-label>
-      <q-item-label lines="2" caption v-if="sheet.answer_key" class="text-grey-8">
-        {{ answerKey?.name }}
-        ({{ sheet.subject.name }})
+
+      <q-item-label lines="1" caption class="flex gap-2" v-if="sheet.aiChecked">
+        <span>{{ sheet.subject?.name }} </span>
       </q-item-label>
-      <q-item-label
-        lines="1"
-        caption
-        class="flex gap-2"
-        v-if="!raw && !sheet.answer_key && evalSheet.ai_checked"
-      >
-        <span>{{ sheet.subject.name }} </span>
+
+      <q-item-label lines="2" caption v-if="sheet.answerKey && sheet.subject" class="text-grey-8">
+        {{ answerKey.name }} ({{ sheet.subject.name }})
       </q-item-label>
     </q-item-section>
 
     <q-item-section side>
       <q-item-label caption class="text-italic text-center">
-        <span v-if="!raw">{{ evalSheet.created_at }}</span>
+        <span v-if="evalSheet.createdAt">{{ evalSheet.createdAt }}</span>
         <span v-else>just now</span>
       </q-item-label>
     </q-item-section>
@@ -61,34 +55,35 @@
 </template>
 
 <script setup lang="ts">
-import {
-  type AnswerSheet,
-  type AnswerSheetRawResult,
-  isChecked,
-  isRaw,
-} from 'src/stores/answer-sheet-store';
+import { type AnswerSheet, type AnswerSheetRaw } from 'src/stores/answer-sheet';
 import { computed } from 'vue';
-import { type AnswerKey, useAnswerKeyStore } from 'src/stores/answer-key-store';
+import { type AnswerKey, useAnswerKeyStore2 } from 'src/stores/answer-key';
 
 const props = defineProps<{
-  sheet: AnswerSheet | AnswerSheetRawResult;
+  sheet: AnswerSheet | AnswerSheetRaw;
 }>();
 
 const emit = defineEmits<{
-  (e: 'select', value: AnswerSheet | AnswerSheetRawResult): void;
+  (e: 'select', value: AnswerSheet | AnswerSheetRaw): void;
 }>();
 
-const answerKeyStore = useAnswerKeyStore();
+const answerKeyStore = useAnswerKeyStore2();
 
-const answerKey = computed(
-  () => (props.sheet.answer_key ? answerKeyStore.get(props.sheet.answer_key) : {}) as AnswerKey,
-);
+const answerKey = computed(() => {
+  const key = props.sheet.answerKey;
 
-const checked = computed(() => isChecked(props.sheet));
+  if (key && typeof key === 'number') {
+    return answerKeyStore.getAnswerKey(key);
+  }
 
-const raw = computed(() => isRaw(props.sheet));
-
-const score = computed(() => (props.sheet as AnswerSheet).score ?? 0);
+  return key as AnswerKey;
+});
 
 const evalSheet = computed(() => props.sheet as AnswerSheet);
+
+const rawSheet = computed(() => props.sheet as AnswerSheetRaw);
+
+const score = computed(() => evalSheet.value.score);
+
+const isFailed = computed(() => evalSheet.value.score === null && evalSheet.value.evalAt);
 </script>

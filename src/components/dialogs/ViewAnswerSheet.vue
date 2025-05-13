@@ -11,8 +11,8 @@
       </q-card-section>
 
       <q-card-section class="scroll column gap-4" style="max-height: 60vh">
-        <q-input :model-value="sheetModel?.student_name" label="Student's Name" />
-        <q-input :model-value="sheetModel?.subject.name" label="Subject" />
+        <q-input :model-value="sheetModel.studentName" label="Student's Name" />
+        <q-input :model-value="sheetModel.subject?.name" label="Subject" />
         <q-input v-if="answerKey" :model-value="answerKey.name" label="Answer Key">
           <template v-slot:append>
             <div class="full-height flex items-center text-[0.9rem]">
@@ -31,37 +31,32 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { DocumentsGrid, Title } from '..';
-import {
-  useAnswerSheetStore,
-  type AnswerSheet,
-  type AnswerSheetRawResult,
-} from 'src/stores/answer-sheet-store';
-import { useAnswerKeyStore } from 'src/stores/answer-key-store';
-import type { LocalFileType } from 'src/composables/types/app';
+import { type AnswerSheetRaw, type AnswerSheet } from 'src/stores/answer-sheet';
+import type { FileType } from 'src/composables/types/app';
 import { ErrorImgSvg } from '../images';
+import type { AnswerKey } from 'src/stores/answer-key';
+import { useAnswerKeyStore2 } from 'src/stores/answer-key';
 
-const answerKeyStore = useAnswerKeyStore();
-const answerSheetStore = useAnswerSheetStore();
+const answerKeyStore = useAnswerKeyStore2();
 
 const props = withDefaults(
   defineProps<{
     dialog: boolean;
-    sheet: AnswerSheet | AnswerSheetRawResult | null;
+    sheet: AnswerSheet | AnswerSheetRaw;
   }>(),
   {
-    sheet: null,
     dialog: false,
   },
 );
 
 const emit = defineEmits<{
   (e: 'update:dialog', value: boolean): void;
-  (e: 'update:sheet', value: AnswerSheet | AnswerSheetRawResult | null): void;
+  (e: 'update:sheet', value: AnswerSheet | AnswerSheetRaw): void;
 }>();
 
-const documents = ref<LocalFileType[]>([]);
+const documents = ref<FileType[]>([]);
 
 const dialogModel = computed({
   get: () => props.dialog,
@@ -73,20 +68,13 @@ const sheetModel = computed({
   set: (v) => emit('update:sheet', v),
 });
 
-const answerKey = computed(() => answerKeyStore.get(props.sheet?.answer_key || 0) ?? null);
+const answerKey = computed(() => {
+  const key = props.sheet.answerKey;
 
-watch(
-  () => props.sheet,
-  async (sheet: AnswerSheet | AnswerSheetRawResult | null): Promise<void> => {
-    if (!sheet || typeof sheet.id !== 'number') return;
+  if (key && typeof key === 'number') {
+    return answerKeyStore.getAnswerKey(key);
+  }
 
-    try {
-      const docs = await answerSheetStore.getDocuments(sheet.id);
-
-      documents.value = docs || [];
-    } catch (err) {
-      console.error(err);
-    }
-  },
-);
+  return key as AnswerKey;
+});
 </script>

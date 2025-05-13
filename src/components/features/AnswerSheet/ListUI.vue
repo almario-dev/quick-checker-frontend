@@ -20,20 +20,32 @@
     />
   </div>
 
-  <ViewSheet v-model:dialog="viewSheetProps.dialog" v-model:sheet="viewSheetProps.sheet" />
+  <ViewSheet
+    v-model:dialog="viewSheetProps.dialog"
+    @hide="viewSheetProps.sheet = EmptySheet"
+    v-model:sheet="viewSheetProps.sheet"
+  />
 </template>
 
 <script setup lang="ts">
-import { type AnswerSheet, type AnswerSheetRawResult } from 'src/stores/answer-sheet-store';
+import {
+  EmptySheet,
+  useAnswerSheetStore,
+  type AnswerSheetRaw,
+  type AnswerSheet,
+} from 'src/stores/answer-sheet';
 import { computed, ref } from 'vue';
-import { SheetItem, ViewSheet } from '..';
+import { SheetItem, ViewSheet } from '../..';
+import { useAnswerKeyStore2 } from 'src/stores/answer-key';
+
+const store = useAnswerSheetStore();
+const answerKeyStore = useAnswerKeyStore2();
 
 const props = withDefaults(
   defineProps<{
     displayOnly?: number;
     perPage?: number;
     noPagination?: boolean;
-    list: (AnswerSheet | AnswerSheetRawResult)[];
     search?: string | number | null;
   }>(),
   {
@@ -43,37 +55,34 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (e: 'update:list', value: (AnswerSheet | AnswerSheetRawResult)[]): void;
   (e: 'update:search', value: string | number | null): void;
 }>();
 
 const page = ref(1);
 const viewSheetProps = ref({
   dialog: false as boolean,
-  sheet: null as AnswerSheet | AnswerSheetRawResult | null,
+  sheet: EmptySheet as AnswerSheet | AnswerSheetRaw,
 });
-
-const listModel = computed({
-  get: () => props.list,
-  set: (v) => emit('update:list', v),
-});
-
 const searchModel = computed({
   get: () => props.search ?? null,
   set: (v) => emit('update:search', v),
 });
 
-const computedList = computed<(AnswerSheet | AnswerSheetRawResult)[]>(() => {
-  if (!searchModel.value) return listModel.value;
+const computedList = computed(() => {
+  const list = [...store.getRecords, ...store.list.pending];
+  const term = searchModel.value?.toString().toLowerCase();
 
-  const searchTerm = searchModel.value.toString().toLowerCase();
+  if (!term) return list;
 
-  return listModel.value.filter((item) => {
-    const studentName = 'student_name' in item ? item.student_name.toLowerCase() : '';
-    const subjectName =
-      'subject' in item && typeof item.subject === 'object' ? item.subject.name.toLowerCase() : '';
+  return list.filter(({ answerKey, subject, studentName }) => {
+    const student = studentName.toLowerCase();
+    const subjectName = subject?.name?.toLowerCase() || '';
+    const akName =
+      typeof answerKey === 'number'
+        ? answerKeyStore.getAnswerKey(answerKey)?.name?.toLowerCase() || ''
+        : answerKey?.name?.toLowerCase() || '';
 
-    return studentName.includes(searchTerm) || subjectName.includes(searchTerm);
+    return student.includes(term) || subjectName.includes(term) || akName.includes(term);
   });
 });
 
@@ -91,7 +100,7 @@ const paginatedList = computed(() => {
   return computedList.value.slice(start, end);
 });
 
-const viewAnswerSheet = (sheet: AnswerSheetRawResult | AnswerSheet): void => {
+const viewAnswerSheet = (sheet: AnswerSheet | AnswerSheetRaw): void => {
   viewSheetProps.value.sheet = sheet;
   viewSheetProps.value.dialog = true;
 };

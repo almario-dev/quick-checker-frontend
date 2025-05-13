@@ -4,7 +4,7 @@
       <div class="flex items-center justify-between text-[1rem] font-[500] text-blue-grey-10">
         <span>Answer Key Sources</span>
         <q-btn
-          v-if="answerKeyStore.getList.length"
+          v-if="answerKeyStore.getAnswerKeys.length"
           color="blue-grey-11"
           text-color="primary"
           rounded
@@ -17,7 +17,7 @@
       </div>
     </q-card-section>
 
-    <q-card-section v-if="answerKeyStore.getList.length" class="q-pa-none">
+    <q-card-section v-if="answerKeyStore.getAnswerKeys.length" class="q-pa-none">
       <div class="bg-white shadow-3 rounded-borders">
         <q-list separator>
           <q-item v-for="key in paginatedAnswerKeys" :key="key.id" class="q-py-md q-pl">
@@ -30,9 +30,9 @@
             <q-item-section>
               <q-item-label lines="1" class="font-[500]">{{ key.name }} </q-item-label>
               <q-item-label caption class="flex items-center gap-x-2 text-blue-grey-8 flex-wrap">
-                <span>{{ key.score ?? 0 }} points</span>
-                <q-separator vertical />
-                <span>{{ key.scans }} scans</span>
+                <span> Total Points: {{ key.score }} </span>
+                <!-- <q-separator vertical />
+                <span>{{ key.scans }} scans</span> -->
               </q-item-label>
             </q-item-section>
 
@@ -45,6 +45,7 @@
                 dense
                 round
                 icon="chevron_right"
+                :to="{ name: 'Answer Key Details', params: { id: key.id } }"
               />
             </q-item-section>
           </q-item>
@@ -70,37 +71,27 @@
 </template>
 
 <script setup lang="ts">
-/* eslint-disable */
-import { useQuasar } from 'quasar';
-import type { Subject } from 'src/composables/interfaces/IApp';
-import { computed, onMounted, ref } from 'vue';
-import { NoData, SubjectDialog } from '..';
-import { useSubjectStore } from 'src/stores/subject-store';
-import { skip } from 'src/assets/utils';
-import { useAnswerKeyStore } from 'src/stores/answer-key-store';
+import { computed, ref } from 'vue';
+import { NoData } from '../..';
 import { useRouter } from 'vue-router';
-import { TestPng } from '../images';
+import { TestPng } from '../../images';
+import { useAnswerKeyStore2 } from 'src/stores/answer-key';
 
-const $q = useQuasar();
-const subjectStore = useSubjectStore();
 const router = useRouter();
-const answerKeyStore = useAnswerKeyStore();
-
-const dialog = ref<boolean>(false);
-const editModel = ref<Subject | null>(null);
+const answerKeyStore = useAnswerKeyStore2();
 
 const page = ref(1);
 const perPage = 5;
 
-const maxPage = computed(() => Math.ceil(answerKeyStore.getList.length / perPage));
+const maxPage = computed(() => Math.ceil(answerKeyStore.getAnswerKeys.length / perPage));
 
 const paginatedAnswerKeys = computed(() => {
   const start = (page.value - 1) * perPage;
   const end = start + perPage;
-  return answerKeyStore.getList.slice(start, end);
+  return answerKeyStore.getAnswerKeys.slice(start, end);
 });
 
-const gotoCreate = (): void => {
-  router.push({ name: 'Create Answer Key' });
+const gotoCreate = async (): Promise<void> => {
+  await router.push({ name: 'Create Answer Key' });
 };
 </script>

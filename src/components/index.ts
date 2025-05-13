@@ -10,8 +10,11 @@ export { default as SheetItem } from './items/AnswerSheetItem.vue';
 // features
 export { default as MySubjects } from './features/MySubjects.vue';
 export { default as DocumentsGrid } from './DocumentsGrid.vue';
-export { default as AnswerSheets } from './features/AnswerSheetsList.vue';
-export { default as MyAnswerKeys } from './features/MyAnswerKeys.vue';
+export { default as AnswerSheets } from './features/AnswerSheet/ListUI.vue';
+export { default as MyAnswerKeys } from './features/AnswerKey/ListUI.vue';
+
+export { default as AnswerKeySetup } from './features/AnswerKey/SetupUI.vue';
+export { default as AnswerSheetSetup } from './features/AnswerSheet/SetupPage.vue';
 
 // dialogs
 export { default as SubjectDialog } from './dialogs/SubjectFormDialog.vue';

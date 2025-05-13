@@ -64,7 +64,7 @@
           color="secondary"
           text-color="white"
           round
-          @click="scanStore.scanNow"
+          @click="app.scanNow"
           :disable="disabled"
         />
 
@@ -101,19 +101,19 @@ import { skip } from 'src/assets/utils';
 import { Title } from 'src/components';
 import { useAlertStore } from 'src/stores/alert-store';
 import { useAnswerKeyStore } from 'src/stores/answer-key-store';
-import { useAnswerSheetStore } from 'src/stores/answer-sheet-store';
+import { useAnswerSheetStore } from 'src/stores/answer-sheet';
+import { useAppStore } from 'src/stores/app';
 import { useAuthStore } from 'src/stores/auth-store';
-import { useScanStore } from 'src/stores/scan-store';
 import { useSubjectStore } from 'src/stores/subject-store';
 import { useUserStore } from 'src/stores/user-store';
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const $q = useQuasar();
+const app = useAppStore();
 const authStore = useAuthStore();
 const userStore = useUserStore();
 const alertStore = useAlertStore();
-const scanStore = useScanStore();
 const answerSheetStore = useAnswerSheetStore();
 const answerKeyStore = useAnswerKeyStore();
 const subjectStore = useSubjectStore();
@@ -139,7 +139,6 @@ const logout = (): void => {
         subjectStore.resetState();
         answerSheetStore.resetState();
         answerKeyStore.resetState();
-        scanStore.resetState();
 
         router.push({ name: 'Guest' }).catch(skip);
       })

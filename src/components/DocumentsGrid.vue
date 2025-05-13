@@ -9,20 +9,15 @@
     </div>
 
     <div
-      v-for="(doc, i) in documentsModel ?? []"
-      :key="i"
+      v-for="doc in documentsModel ?? []"
+      :key="doc.id"
       class="h-[5rem] shadow-3 rounded-borders overflow-hidden relative"
       v-ripple
-      @click="openPreview((doc as FileUpload).path || (doc as LocalFileType).file)"
+      @click="openPreview(doc.path || doc.blob)"
     >
-      <q-img
-        :src="(doc as FileUpload).path || blobToImageUrl((doc as LocalFileType).file)"
-        no-native-menu
-        height="100%"
-      >
+      <q-img :src="doc.blob ? blobToImageUrl(doc.blob) : doc.path" no-native-menu height="100%">
         <div class="absolute-full flex flex-center"></div>
         <q-btn
-          v-if="(doc as LocalFileType).file"
           icon="close"
           size="xs"
           round
@@ -31,7 +26,7 @@
           color="grey-6"
           unelevated
           v-ripple.stop
-          @click="remove((doc as LocalFileType).id)"
+          @click="remove(doc)"
         />
       </q-img>
     </div>
@@ -44,29 +39,27 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar';
-import type { LocalFileType } from 'src/composables/types/app';
+import type { FileType } from 'src/composables/types/app';
 import { blobToImageUrl } from 'src/composables/useCamera';
 import { computed, reactive } from 'vue';
 import { Preview } from '.';
-import type { FileUpload } from 'src/composables/interfaces/IApp';
 import { EmptySvg } from './images';
 
 const $q = useQuasar();
 
 const props = withDefaults(
   defineProps<{
-    documents: LocalFileType[] | FileUpload[] | null;
+    documents: FileType[];
     usePlaceholder?: boolean;
   }>(),
   {
-    documents: null,
     usePlaceholder: false,
   },
 );
 
 const emit = defineEmits<{
-  (e: 'update:documents', value: LocalFileType[] | FileUpload[] | null): void;
-  (e: 'remove', value: string): void;
+  (e: 'update:documents', value: FileType[]): void;
+  (e: 'remove', value: FileType): void;
 }>();
 
 const previewModel = reactive({
@@ -81,16 +74,18 @@ const documentsModel = computed({
 
 const hasDocuments = computed(() => props.documents?.length);
 
-const remove = (id: string): void => {
+const remove = (file: FileType): void => {
   $q.dialog({
-    title: 'Remove File',
+    title: 'Remove File?',
     message: 'This action cannot be undone.',
     cancel: true,
     ok: 'Confirm',
-  }).onOk(() => emit('remove', id));
+  }).onOk(() => emit('remove', file));
 };
 
-const openPreview = (file: Blob | string): void => {
+const openPreview = (file: Blob | string | undefined): void => {
+  if (!file) return;
+
   if (typeof file === 'string') {
     previewModel.image = file;
   } else if (file instanceof Blob) {

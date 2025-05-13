@@ -11,9 +11,9 @@
 
     <DocumentsGrid
       class="mt-4"
-      v-model:documents="scanStore.documents"
+      v-model:documents="model.documents"
       use-placeholder
-      @remove="scanStore.removeDocument"
+      @remove="(d) => emit('remove-document', d)"
     />
 
     <div class="flex items-center justify-between no-wrap gap-4 mt-6">
@@ -23,30 +23,28 @@
           Uses AI to evaluate answers without answer key provided.
         </span>
       </div>
-      <q-toggle v-model="scanStore.aiCheck" icon="smart_toy" color="secondary" />
+      <q-toggle v-model="model.aiChecked" icon="smart_toy" color="secondary" />
     </div>
 
     <div class="mb-2 mt-6">
       <Title title="Answer Key Source" dialog />
     </div>
 
-    <q-item v-if="!scanStore.aiCheck" class="q-pl-sm rounded-borders shadow-2" clickable v-ripple>
+    <q-item v-if="!model.aiChecked" class="q-pl-sm rounded-borders shadow-2" clickable v-ripple>
       <q-item-section avatar class="q-pr-sm">
-        <q-avatar v-if="scanStore.hasAnswerKey" rounded size="3.5rem" color="grey-11">
+        <q-avatar v-if="model.answerKey !== null" rounded size="3.5rem" color="grey-11">
           <q-img :src="TestPng" width="50%" />
         </q-avatar>
         <q-avatar v-else rounded size="3.5rem" icon="question_mark" text-color="negative" />
       </q-item-section>
 
       <q-item-section>
-        <template v-if="scanStore.hasAnswerKey">
+        <template v-if="model.answerKey !== null">
           <q-item-label lines="1" class="font-[500]">
-            {{ scanStore.getAnswerKey?.name }}
+            {{ model.answerKey.name }}
           </q-item-label>
           <q-item-label caption class="flex items-center gap-x-2 flex-wrap">
-            <span> {{ scanStore.getAnswerKey?.subject.name }} </span>
-            <q-separator vertical />
-            <span>Total Points: {{ scanStore.getAnswerKey?.score ?? 0 }}</span>
+            Total Points: {{ model.answerKey.score ?? 0 }}
           </q-item-label>
         </template>
         <q-item-label v-else lines="2"> Please select an answer key</q-item-label>
@@ -79,10 +77,10 @@
       <Title title="Metadata" dialog />
     </div>
 
-    <q-form ref="formRef" class="flex column gap-2">
+    <q-form ref="formRef" class="flex column gap-2" @submit.prevent="submit">
       <q-select
         outlined
-        v-model="scanStore.subject"
+        v-model="model.subject"
         :options="subjectStore.getSubjects"
         option-label="name"
         label="Subject"
@@ -93,14 +91,17 @@
 
       <q-input
         label="Student's Name"
+        lazy-rules
+        :rules="createRules({ required: true })"
         outlined
-        v-model="scanStore.metadata.studentName"
-        hint="Enter if not shown in the uploaded documents."
+        v-model="model.studentName"
       />
+
+      <slot />
     </q-form>
   </q-page>
 
-  <q-footer reveal class="bg-transparent px-6">
+  <q-footer v-if="!noFooter" reveal class="bg-transparent px-6">
     <div class="my-6">
       <q-btn
         label="Quick Check"
@@ -108,47 +109,72 @@
         padding="0.875rem"
         icon="auto_awesome"
         color="teal-5"
-        @click="scanStore.quickCheck"
+        :loading="loading"
+        @click="simulateSubmit"
       />
     </div>
   </q-footer>
 
   <SelectAnswerKey
     v-model:dialog="answerKeySelectionDialog"
-    v-model:answer-key="scanStore.answerKey"
-    v-model:subject="scanStore.subject"
+    v-model:answer-key="model.answerKey"
+    v-model:subject="model.subject"
   />
 </template>
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar';
-import { newFileObject } from 'src/assets/utils';
 import { DocumentsGrid, SelectAnswerKey, Title } from 'src/components';
 import { ScanningPng, TestPng } from 'src/components/images';
+import type { FileType } from 'src/composables/types/app';
 import { takePicture } from 'src/composables/useCamera';
 import { createRules } from 'src/composables/useRules';
-import { useScanStore } from 'src/stores/scan-store';
+import { type AnswerSheetRaw } from 'src/stores/answer-sheet';
 import { useSubjectStore } from 'src/stores/subject-store';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+
+const props = withDefaults(
+  defineProps<{
+    modelValue: AnswerSheetRaw;
+    loading?: boolean;
+    noFooter?: boolean;
+  }>(),
+  {
+    loading: false,
+    noFooter: false,
+  },
+);
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: AnswerSheetRaw): void;
+  (e: 'remove-document', value: FileType): void;
+  (e: 'submit'): void;
+}>();
 
 const $q = useQuasar();
-const scanStore = useScanStore();
 const subjectStore = useSubjectStore();
 
+const model = computed({
+  get: () => props.modelValue,
+  set: (v) => emit('update:modelValue', v),
+});
+
 const answerKeySelectionDialog = ref<boolean>(false);
+const formRef = ref<HTMLFormElement | null>(null);
 
 const scan = async (): Promise<void> => {
-  const file = await takePicture();
-  scanStore.documents.push(newFileObject(file));
+  const blob = await takePicture();
+  model.value.documents.push({ id: Date.now(), blob });
 };
 
 const syncSubjects = (): void => {
-  const answerKeySubject = scanStore.getAnswerKey?.subject.id;
-  const currentSubject = scanStore.subject?.id || null;
+  const akSubId = model.value.subject?.id || null;
+  const subId = model.value.subject?.id || null;
 
-  if (!answerKeySubject || !currentSubject) return; // no answer has been selected yet
+  if (!akSubId || subId) return;
 
-  if (answerKeySubject !== currentSubject) {
+  // answer key subject and the model subject should match
+  if (akSubId !== subId) {
     $q.dialog({
       title: 'Change Subject?',
       message: 'Switching subjects will reset your selected answer key. Continue?',
@@ -156,12 +182,23 @@ const syncSubjects = (): void => {
       ok: 'Yes',
     })
       .onOk(() => {
-        scanStore.answerKey = null;
+        model.value.subject = null;
       })
       .onCancel(() => {
-        if (!scanStore.getAnswerKey?.subject) return;
-        scanStore.subject = scanStore.getAnswerKey?.subject;
+        if (!model.value.answerKey?.subject) return;
+        model.value.subject = model.value.answerKey?.subject;
       });
+  }
+};
+
+const submit = (): void => {
+  emit('submit');
+};
+
+const simulateSubmit = async (): Promise<void> => {
+  const valid = await formRef.value?.validate();
+  if (valid) {
+    submit();
   }
 };
 </script>

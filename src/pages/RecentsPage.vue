@@ -3,7 +3,7 @@
     <q-card class="bg-transparent no-shadow">
       <q-card-section class="flex gap-[1rem] items-start q-px-none">
         <q-input
-          v-if="answerSheetStore.getList.length"
+          v-if="answerSheetStore.getRecords.length"
           class="grow"
           outlined
           clearable
@@ -20,7 +20,7 @@
 
       <q-card-section class="q-pa-none q-pt-md">
         <AnswerSheets
-          v-if="answerSheetStore.getList.length"
+          v-if="answerSheetStore.getRecords.length"
           v-model:list="answerSheetStore.list"
           v-model:search="search"
         />
@@ -35,7 +35,7 @@
 /* eslint-disable */
 import { AnswerSheets, NoData } from 'src/components';
 import { useAnswerKeyStore } from 'src/stores/answer-key-store';
-import { isChecked, isRaw, useAnswerSheetStore } from 'src/stores/answer-sheet-store';
+import { useAnswerSheetStore } from 'src/stores/answer-sheet';
 import { ref } from 'vue';
 
 const search = ref<string>('');
@@ -44,5 +44,5 @@ const answerKeyStore = useAnswerKeyStore();
 
 const onSearch = (v: string | number | null): void => {};
 
-// const answerSheetsList = computed(() => [...answerSheetStore.getList].reverse())
+// const answerSheetsList = computed(() => [...answerSheetStore.getRecords].reverse())
 </script>

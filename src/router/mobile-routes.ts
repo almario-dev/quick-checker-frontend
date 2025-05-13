@@ -47,12 +47,18 @@ const mobileRoutes: RouteRecordRaw[] = [
       {
         path: 'create-answer-key',
         name: 'Create Answer Key',
-        component: () => import('pages/CreateAnswerKey.vue'),
+        component: () => import('src/pages/AnswerKeyCreatePage.vue'),
+      },
+      {
+        path: 'answer-key-details/:id',
+        name: 'Answer Key Details',
+        props: true,
+        component: () => import('src/pages/AnswerKeyDetailsPage.vue'),
       },
       {
         path: 'scan-answer-sheets',
         name: 'Scan Answer Sheets',
-        component: () => import('pages/ScanAnswerSheets.vue'),
+        component: () => import('pages/AnswerSheetScanPage.vue'),
       },
     ],
   },

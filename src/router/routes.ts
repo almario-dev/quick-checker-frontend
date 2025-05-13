@@ -7,7 +7,7 @@ import webRoutes from './web-routes';
 const notMobile = computed(() => !Platform.is.nativeMobileWrapper);
 
 const routes: RouteRecordRaw[] = [
-  ...(notMobile.value ? webRoutes : mobileRoutes),
+  ...(!notMobile.value ? webRoutes : mobileRoutes),
 
   // Always leave this as last one,
   // but you can also remove it

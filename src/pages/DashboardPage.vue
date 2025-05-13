@@ -22,7 +22,7 @@
             color="secondary"
             icon="document_scanner"
             padding="0.7rem"
-            @click="scanStore.scanNow"
+            @click="app.scanNow"
           />
         </q-card-section>
       </q-card>
@@ -32,10 +32,10 @@
           <div class="text-[1rem] font-[500] text-blue-grey-10">Latest check(s)</div>
         </q-card-section>
 
-        <q-card-section v-if="answerSheetStore.getList.length" class="q-pa-none">
+        <q-card-section v-if="answerSheetStore.getRecords.length" class="q-pa-none">
           <AnswerSheets v-model:list="answerSheetStore.list" no-pagination :display-only="5" />
 
-          <div class="flex justify-center" v-if="answerSheetStore.getList.length > 5">
+          <div class="flex justify-center" v-if="answerSheetStore.getRecords.length > 5">
             <q-btn label="View More" flat text-color="blue-grey-5" :to="{ name: 'Recents' }" />
           </div>
         </q-card-section>
@@ -52,12 +52,12 @@
 
 <script setup lang="ts">
 import { MyAnswerKeys, MySubjects, NoData } from 'src/components';
-import { useScanStore } from 'src/stores/scan-store';
 import { useUserStore } from 'src/stores/user-store';
 import { AnswerSheets } from '../components';
-import { useAnswerSheetStore } from 'src/stores/answer-sheet-store';
+import { useAnswerSheetStore } from 'src/stores/answer-sheet';
+import { useAppStore } from 'src/stores/app';
 
 const userStore = useUserStore();
-const scanStore = useScanStore();
 const answerSheetStore = useAnswerSheetStore();
+const app = useAppStore();
 </script>

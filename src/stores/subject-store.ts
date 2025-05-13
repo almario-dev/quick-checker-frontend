@@ -9,6 +9,11 @@ import { useRequestController } from 'src/composables/useRequestController';
 
 export const FETCH_IN_PROGRESS = 1;
 
+export const EmptySubject: Subject = {
+  id: 0,
+  name: '',
+};
+
 export const useSubjectStore = defineStore('subject', () => {
   const alertStore = useAlertStore();
 

@@ -24,7 +24,7 @@
             ]"
             clickable
             v-ripple
-            @click="select(answerKey.id)"
+            @click="select(answerKey)"
           >
             <q-item-section avatar class="q-pa-none">
               <q-avatar rounded size="3rem" color="grey-11">
@@ -63,12 +63,10 @@
 import { computed } from 'vue';
 import { Title } from '..';
 import type { Subject } from 'src/composables/interfaces/IApp';
-import { type AnswerKey, useAnswerKeyStore } from 'src/stores/answer-key-store';
-import { useAlertStore } from 'src/stores/alert-store';
 import { TestPng } from '../images';
+import { type AnswerKey, useAnswerKeyStore2 } from 'src/stores/answer-key';
 
-const alertStore = useAlertStore();
-const answerKeyStore = useAnswerKeyStore();
+const answerKeyStore = useAnswerKeyStore2();
 
 const props = withDefaults(
   defineProps<{
@@ -96,32 +94,18 @@ const dialogModel = computed({
 
 const answerKeys = computed(() => {
   if (!props.subject) {
-    return answerKeyStore.getList;
+    return answerKeyStore.getAnswerKeys;
   }
 
-  return answerKeyStore.getList.filter((a) => a.subject.id === props.subject?.id);
+  return answerKeyStore.getAnswerKeys.filter((a) => a.subject.id === props.subject?.id);
 });
 
-const select = async (key: number): Promise<void> => {
-  try {
-    const result = await answerKeyStore.fetchFullDetails(key);
-
-    if (!result) {
-      throw new Error();
-    }
-
-    // if no subject has been selected before, follow the answer key's
-    if (!props.subject) {
-      emit('update:subject', result.subject);
-    }
-
-    emit('update:answerKey', result);
-    emit('update:dialog', false);
-  } catch {
-    alertStore.Swap({
-      type: 'negative',
-      message: 'Unable to fetch answer key data. Please try again or select a different one.',
-    });
+const select = (key: AnswerKey): void => {
+  if (!props.subject) {
+    emit('update:subject', key.subject);
   }
+
+  emit('update:answerKey', key);
+  emit('update:dialog', false);
 };
 </script>

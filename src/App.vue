@@ -5,15 +5,17 @@
 <script setup lang="ts">
 import { watch } from 'vue';
 import { useSubjectStore } from './stores/subject-store';
-import { useAnswerKeyStore } from './stores/answer-key-store';
-import { useAnswerSheetStore } from './stores/answer-sheet-store';
+import { useAnswerSheetStore } from './stores/answer-sheet';
 import { useUserStore } from './stores/user-store';
 import { App } from '@capacitor/app';
+import { useAppStore } from './stores/app';
+import { useAnswerKeyStore2 } from './stores/answer-key';
 
 const answerSheetStore = useAnswerSheetStore();
-const answerKeyStore = useAnswerKeyStore();
+const answerKeyStore = useAnswerKeyStore2();
 const subjectStore = useSubjectStore();
 const userStore = useUserStore();
+const app = useAppStore();
 
 watch(
   () => userStore.isAuthenticated,
@@ -34,7 +36,7 @@ watch(
 );
 
 const onAppStateChange = ({ isActive }: { isActive: boolean }) => {
-  answerSheetStore.isActive = isActive;
+  app.isActive = isActive;
 };
 
 void App.addListener('appStateChange', onAppStateChange);
