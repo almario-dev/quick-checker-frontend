@@ -20,7 +20,9 @@ const router = useRouter();
 const route = useRoute();
 
 const bgColor = computed(() =>
-  route.name === 'Scan Answer Sheets' ? 'bg-white' : 'bg-transparent',
+  ['Scan Answer Sheets', 'Answer Sheet Details'].includes(String(route.name))
+    ? 'bg-white'
+    : 'bg-transparent',
 );
 
 const back = (): void => router.go(-1);

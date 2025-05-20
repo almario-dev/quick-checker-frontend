@@ -59,7 +59,7 @@
                 <q-input
                   lazy-rules
                   :rules="createRules({ required: true })"
-                  v-model="item.item_description"
+                  v-model="item.item_description as string"
                   label="Description"
                   type="textarea"
                   autogrow
@@ -70,7 +70,7 @@
                   lazy-rules
                   :rules="createRules({ required: true })"
                   filled
-                  v-model="item.key"
+                  v-model="item.key as string"
                   label="Answer Key"
                   autogrow
                   dense

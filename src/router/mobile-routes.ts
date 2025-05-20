@@ -60,6 +60,12 @@ const mobileRoutes: RouteRecordRaw[] = [
         name: 'Scan Answer Sheets',
         component: () => import('pages/AnswerSheetScanPage.vue'),
       },
+      {
+        path: 'answer-sheet-details/:id',
+        name: 'Answer Sheet Details',
+        props: true,
+        component: () => import('pages/AnswerSheetDetailsPage.vue'),
+      },
     ],
   },
 ];

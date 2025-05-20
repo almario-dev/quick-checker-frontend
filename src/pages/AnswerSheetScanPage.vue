@@ -1,5 +1,5 @@
 <template>
-  <q-page>
+  <q-page class="px-6 pb-2">
     <AnswerSheetSetup
       v-model="answerSheet.form"
       @submit="answerSheet.quickCheck"

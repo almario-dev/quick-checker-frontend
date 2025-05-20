@@ -27,11 +27,12 @@ export interface FileUpload {
 export type TestItem = {
   points?: number;
   item_number: number | string;
-} & Record<string, number | string>;
+} & Record<string, number | string | boolean>;
 
 export interface Test {
   title: string;
-  max_points: number;
+  max_points?: number;
+  points_acquired?: number;
   items?: TestItem[];
 }
 

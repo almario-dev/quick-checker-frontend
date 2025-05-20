@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia';
 import { computed, reactive, ref } from 'vue';
-import type { Subject } from 'src/composables/interfaces/IApp';
+import type { Context, Subject } from 'src/composables/interfaces/IApp';
 import { useRequestController } from 'src/composables/useRequestController';
 import { api } from 'src/boot/axios';
 import { skip } from 'src/assets/utils';
-import type { FileType, LocalFileType } from 'src/composables/types/app';
+import type { FileType } from 'src/composables/types/app';
 import { type AnswerKey } from './answer-key';
 import { useAlertStore } from './alert-store';
 
@@ -26,6 +26,11 @@ export interface AnswerSheetRaw extends Omit<AnswerSheet, 'id' | 'answerKey' | '
   subject: Subject | null;
   documents: FileType[];
   isRaw: true;
+}
+
+export interface AnswerSheetInfo {
+  documents: FileType[];
+  context: Context | null;
 }
 
 export const EmptySheet: AnswerSheetRaw = {
@@ -104,13 +109,10 @@ export const useAnswerSheetStore = defineStore('answer-sheet', () => {
     });
   };
 
-  const getDocuments = async (id: number): Promise<LocalFileType[] | void> => {
-    return await send('get-documents', async (): Promise<LocalFileType[] | void> => {
+  const getInfo = async (id: number): Promise<AnswerSheetInfo | void> => {
+    return await send('get-documents', async (): Promise<AnswerSheetInfo | void> => {
       const { data } = await api.get(`answer-sheets/${id}/info`);
-
-      if (!data.documents) return;
-
-      return data.documents;
+      return data;
     });
   };
 
@@ -206,7 +208,7 @@ export const useAnswerSheetStore = defineStore('answer-sheet', () => {
     getList,
     init,
     fetch,
-    getDocuments,
+    getInfo,
     resetState,
     verifyRaw,
     reset,

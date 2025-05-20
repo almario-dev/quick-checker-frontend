@@ -19,25 +19,20 @@
       color="grey-7"
     />
   </div>
-
-  <ViewSheet
-    v-model:dialog="viewSheetProps.dialog"
-    @hide="viewSheetProps.sheet = EmptySheet"
-    v-model:sheet="viewSheetProps.sheet"
-  />
 </template>
 
 <script setup lang="ts">
 import {
-  EmptySheet,
   useAnswerSheetStore,
   type AnswerSheetRaw,
   type AnswerSheet,
 } from 'src/stores/answer-sheet';
 import { computed, ref } from 'vue';
-import { SheetItem, ViewSheet } from '../..';
+import { SheetItem } from '../..';
 import { useAnswerKeyStore2 } from 'src/stores/answer-key';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const store = useAnswerSheetStore();
 const answerKeyStore = useAnswerKeyStore2();
 
@@ -59,10 +54,7 @@ const emit = defineEmits<{
 }>();
 
 const page = ref(1);
-const viewSheetProps = ref({
-  dialog: false as boolean,
-  sheet: EmptySheet as AnswerSheet | AnswerSheetRaw,
-});
+
 const searchModel = computed({
   get: () => props.search ?? null,
   set: (v) => emit('update:search', v),
@@ -100,8 +92,7 @@ const paginatedList = computed(() => {
   return computedList.value.slice(start, end);
 });
 
-const viewAnswerSheet = (sheet: AnswerSheet | AnswerSheetRaw): void => {
-  viewSheetProps.value.sheet = sheet;
-  viewSheetProps.value.dialog = true;
+const viewAnswerSheet = async (sheet: AnswerSheet | AnswerSheetRaw): Promise<void> => {
+  await router.push({ name: 'Answer Sheet Details', params: { id: sheet.id } });
 };
 </script>
