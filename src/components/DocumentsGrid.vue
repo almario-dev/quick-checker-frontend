@@ -8,29 +8,14 @@
       <span class="text-grey-6 font-[400] text-[1rem]">No Documents Available</span>
     </div>
 
-    <div
+    <DocumentTile
       v-for="doc in documentsModel ?? []"
       :key="doc.id"
-      class="h-[5rem] shadow-3 rounded-borders overflow-hidden relative"
-      v-ripple
-      @click="openPreview(doc.path || doc.blob)"
-    >
-      <q-img :src="doc.blob ? blobToImageUrl(doc.blob) : doc.path" no-native-menu height="100%">
-        <div class="absolute-full flex flex-center"></div>
-        <q-btn
-          v-if="!loading"
-          icon="close"
-          size="xs"
-          round
-          class="absolute all-pointer-events"
-          style="top: 8px; right: 8px"
-          color="grey-6"
-          unelevated
-          v-ripple.stop
-          @click="remove(doc)"
-        />
-      </q-img>
-    </div>
+      :doc="doc"
+      :loading="props.loading"
+      @remove="remove"
+      @preview="openPreview"
+    />
 
     <slot name="after" />
   </div>
@@ -43,7 +28,7 @@ import { useQuasar } from 'quasar';
 import type { FileType } from 'src/composables/types/app';
 import { blobToImageUrl } from 'src/composables/useCamera';
 import { computed, reactive } from 'vue';
-import { Preview } from '.';
+import { DocumentTile, Preview } from '.';
 import { EmptySvg } from './images';
 
 const $q = useQuasar();

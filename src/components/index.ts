@@ -6,6 +6,7 @@ export { default as CustomForm } from './FormComponent.vue';
 export { default as NoData } from './NoData.vue';
 
 export { default as SheetItem } from './items/AnswerSheetItem.vue';
+export { default as DocumentTile } from './DocumentTile.vue';
 
 // features
 export { default as MySubjects } from './features/MySubjects.vue';
