@@ -12,14 +12,14 @@
   </div>
 
   <div class="bg-white p-6 pb-2 grow">
-    <div class="flex items-center justify-between no-wrap gap-4 mb-4">
+    <div v-if="mode === 'create'" class="flex items-center justify-between no-wrap gap-4 mb-4">
       <div class="flex column">
         <span class="text-body text-weight-medium">Use Questionnaire</span>
         <span class="text-caption text-grey-7">
           Upload the test questionnaire only. AI will extract answers automatically.
         </span>
       </div>
-      <span v-if="mode !== 'create'" class="font-bold text-grey-9">Off</span>
+      <span v-if="mode !== 'create'" class="font-bold text-grey-7">Off</span>
       <q-toggle v-else v-model="model.useQuestionnaire" icon="fact_check" color="secondary" />
     </div>
 
@@ -132,6 +132,7 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: AnswerKeyForm): void;
   (e: 'submit'): void;
   (e: 'remove-document', value: FileType): void;
+  (e: 'add-document', value: FileType): void;
 }>();
 
 const model = computed({
@@ -154,8 +155,9 @@ const previewModel = reactive({
 
 const scan = async (): Promise<void> => {
   const blob = await takePicture();
-
-  model.value.documents.push({ id: Date.now(), blob });
+  const obj = { id: Date.now(), blob };
+  model.value.documents.push(obj);
+  emit('add-document', obj);
 };
 
 const emitSubmit = async (): Promise<void> => {

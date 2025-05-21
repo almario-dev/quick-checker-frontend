@@ -37,6 +37,6 @@ export interface Test {
 }
 
 export interface Context {
-  total_points: number;
+  max_points: number;
   tests: Test[];
 }

@@ -186,7 +186,7 @@ export const useAnswerKeyStore2 = defineStore('answer-key-2', () => {
       const form = new FormData();
 
       // get the total points
-      context.total_points = context.tests.reduce(
+      context.max_points = context.tests.reduce(
         (total, test) => total + (Number(test.max_points) || 0),
         0,
       );

@@ -1,6 +1,13 @@
 <template>
   <q-page class="column">
-    <AnswerKeySetup v-model="model" mode="edit" no-footer :loading="loading">
+    <AnswerKeySetup
+      v-model="model"
+      mode="edit"
+      no-footer
+      :loading="loading"
+      @remove-document="hasRemovedDocument = true"
+      @add-document="hasRemovedDocument = true"
+    >
       <template v-slot:header>
         <div class="column items-center gap-4 full-width">
           <h6 class="text-blue-grey-8 text-center grow text-weight-regular">Use Answer Key</h6>
@@ -97,10 +104,19 @@
       <div v-if="!loading" class="q-mb-md">
         <div class="column items-center gap-2 text-grey-9 text-[0.8rem]">
           <span>Not satisfied with the results?</span>
-          <q-btn padding="0.5rem 0.75rem" color="teal" outline @click="reRunAnalysis">
+          <q-btn
+            padding="0.5rem 0.75rem"
+            color="teal"
+            outline
+            @click="reRunAnalysis"
+            :disable="hasRemovedDocument"
+          >
             <q-icon name="auto_awesome" size="1rem" />
             <span class="ml-2">Re-run analysis</span>
           </q-btn>
+          <span v-if="hasRemovedDocument" class="text-xs text-negative">
+            Save your changes before running analysis again.
+          </span>
         </div>
         <div class="text-grey-8 q-my-lg relative">
           <span
@@ -167,6 +183,7 @@ const answerKey = computed<AnswerKey>(
 
 const model = ref(answerKey.value as AnswerKeyForm);
 const loading = ref<boolean>(false);
+const hasRemovedDocument = ref<boolean>(false); // to prevent rerunning analysis if a document has been added/removed
 
 const tests = computed(() => model.value.context?.tests || []);
 
@@ -259,12 +276,15 @@ const saveChanges = (): void => {
       .then((data) => {
         model.value = { ...model.value, ...data };
         alertStore.Swap({ type: 'positive', message: 'Successfully saved.' });
+        hasRemovedDocument.value = false;
       })
       .catch(skip);
   });
 };
 
 const reRunAnalysis = () => {
+  if (hasRemovedDocument.value) return;
+
   $q.dialog({
     title: 'Re-run Analysis?',
     message: 'This will replace the existing analysis. You may need to review it again afterward.',
