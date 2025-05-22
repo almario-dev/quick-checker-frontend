@@ -102,8 +102,27 @@
       <p v-else class="text-center text-italic text-grey-7">Loading analysis...</p>
 
       <div v-if="!loading" class="q-mb-md">
-        <div class="column items-center gap-2 text-grey-9 text-[0.8rem]">
-          <span>Not satisfied with the results?</span>
+        <div class="flex justify-center gap-2 text-grey-9 text-[0.8rem]">
+          <q-btn
+            padding="0.5rem 0.75rem"
+            size="0.8rem"
+            color="blue-8"
+            label="Save"
+            @click="saveChanges"
+          />
+
+          <q-btn
+            size="0.8rem"
+            padding="0.5rem 0.75rem"
+            color="red-5"
+            icon="delete"
+            flat
+            @click="deleteAnswerKey"
+          />
+        </div>
+
+        <div class="column items-center gap-2 text-grey-9 text-[0.8rem] mt-12">
+          <span class="mb-1">Not satisfied with the results?</span>
           <q-btn
             padding="0.5rem 0.75rem"
             color="teal"
@@ -117,33 +136,6 @@
           <span v-if="hasRemovedDocument" class="text-xs text-negative">
             Save your changes before running analysis again.
           </span>
-        </div>
-        <div class="text-grey-8 q-my-lg relative">
-          <span
-            class="text-[0.7rem] bg-white px-1 absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%]"
-          >
-            Other actions
-          </span>
-          <q-separator />
-        </div>
-
-        <div class="flex justify-center gap-2 text-grey-9 text-[0.8rem]">
-          <q-btn
-            size="0.8rem"
-            padding="0.5rem 0.75rem"
-            color="negative"
-            icon="delete"
-            label="Delete"
-            @click="deleteAnswerKey"
-          />
-          <q-btn
-            padding="0.5rem 0.75rem"
-            size="0.8rem"
-            color="blue-8"
-            icon="save"
-            label="Save changes"
-            @click="saveChanges"
-          />
         </div>
       </div>
     </AnswerKeySetup>
