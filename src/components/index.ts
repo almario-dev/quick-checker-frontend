@@ -5,14 +5,15 @@ export { default as Title } from './PageTitle.vue';
 export { default as CustomForm } from './FormComponent.vue';
 export { default as NoData } from './NoData.vue';
 
-export { default as SheetItem } from './items/AnswerSheetItem.vue';
 export { default as DocumentTile } from './DocumentTile.vue';
+export { default as SheetItem } from './features/AnswerSheet/ListItem.vue';
 
 // features
 export { default as MySubjects } from './features/MySubjects.vue';
 export { default as DocumentsGrid } from './DocumentsGrid.vue';
 export { default as AnswerSheets } from './features/AnswerSheet/ListUI.vue';
 export { default as MyAnswerKeys } from './features/AnswerKey/ListUI.vue';
+export { default as Editor } from './AnalysisEditor.vue';
 
 export { default as AnswerKeySetup } from './features/AnswerKey/SetupUI.vue';
 export { default as AnswerSheetSetup } from './features/AnswerSheet/SetupPage.vue';
