@@ -1,99 +1,123 @@
 <template>
-  <q-page class="p-6 column items-stretch justify-center">
-    <q-form
-      class="bg-white p-5 pt-0 rounded-lg shadow-6 q-gutter-y-sm"
-      autofocus
-      @submit.prevent="submit"
-    >
-      <div class="text-center column mb-8 items-center justify-center">
-        <AppLogo size="md" />
-        <span class="text-[1.5rem] font-[600] text-primary">Quick Checker</span>
-        <span class="text-[1rem] text-blue-grey-8 mt-2">Login to your account</span>
+  <!-- Login Form -->
+  <div class="bg-white rounded-2xl shadow-xl p-6 mb-6 border border-gray-100">
+    <div class="flex items-center justify-center mb-6">
+      <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+        <q-icon name="login" class="text-green-600 text-lg" />
       </div>
-      <q-input
-        v-model="form.email"
-        label="Email Address"
-        outlined
-        lazy-rules
-        :rules="rules.email"
-      />
-      <q-input
-        v-model="form.password"
-        :type="showPassword ? 'text' : 'password'"
-        label="Password"
-        outlined
-        lazy-rules
-        :rules="rules.password"
-      >
-        <template v-if="form.password" v-slot:append>
-          <q-btn
-            :icon="showPassword ? 'visibility_off' : 'visibility'"
-            flat
-            round
-            dense
-            color="grey-6"
-            @click="showPassword = !showPassword"
-          />
-        </template>
-      </q-input>
+      <div class="text-xl font-semibold text-gray-800">Sign In</div>
+    </div>
+
+    <q-form @submit="onLogin" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+        <q-input
+          v-model="loginForm.email"
+          type="email"
+          placeholder="teacher@school.edu"
+          outlined
+          class="w-full"
+          :rules="[(val) => !!val || 'Email is required']"
+        >
+          <template v-slot:prepend>
+            <q-icon name="email" class="text-gray-400" />
+          </template>
+        </q-input>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+        <q-input
+          v-model="loginForm.password"
+          :type="showLoginPassword ? 'text' : 'password'"
+          placeholder="Enter your password"
+          outlined
+          class="w-full"
+          :rules="[(val) => !!val || 'Password is required']"
+        >
+          <template v-slot:prepend>
+            <q-icon name="lock" class="text-gray-400" />
+          </template>
+          <template v-slot:append>
+            <q-icon
+              :name="showLoginPassword ? 'visibility_off' : 'visibility'"
+              class="cursor-pointer text-gray-400"
+              @click="showLoginPassword = !showLoginPassword"
+            />
+          </template>
+        </q-input>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <a href="#" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+          Forgot Password?
+        </a>
+      </div>
 
       <q-btn
         type="submit"
-        class="full-width q-mt-md"
-        padding="md"
-        label="Login"
+        label="Sign In"
         color="primary"
-        :loading="loading"
-        :disable="loading"
+        class="full-width q-py-md rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+        no-caps
+        :loading="loginLoading"
       />
-
-      <div class="text-center q-mt-lg">
-        No account yet?
-        <q-btn label="Create here" color="info" no-caps dense flat :to="{ name: 'Register' }" />
-      </div>
     </q-form>
-  </q-page>
+
+    <div class="flex items-center text-center mt-6">
+      <span class="text-sm text-gray-600">Don't have an account?</span>
+      <q-btn
+        :to="{ name: 'Register' }"
+        label="Create here"
+        flat
+        no-caps
+        class="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors ml-1"
+        unelevated
+        padding=""
+        color="primary"
+      />
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { useQuasar } from 'quasar';
-import AppLogo from 'src/components/AppLogo.vue';
-import type { IUserLogin } from 'src/composables/interfaces/IUser';
-import { createRules } from 'src/composables/useRules';
-import { useAuthStore } from 'src/stores/auth-store';
-import { reactive, ref } from 'vue';
+import { ref } from 'vue';
+import type { LoginForm } from 'src/types/auth';
+import { useAuthStore } from 'src/stores/auth';
 import { useRouter } from 'vue-router';
 
-const $q = useQuasar();
+const auth = useAuthStore();
 const router = useRouter();
-const authStore = useAuthStore();
-const loading = ref<boolean>(false);
-const showPassword = ref<boolean>(false);
 
-const rules = {
-  email: createRules({ required: true }),
-  password: createRules({ required: true }),
-};
-
-const form = reactive<IUserLogin>({
+// Login form data
+const loginForm = ref<LoginForm>({
   email: '',
   password: '',
 });
 
-const submit = () => {
-  loading.value = true;
+// Password visibility toggles
+const showLoginPassword = ref<boolean>(false);
 
-  authStore
-    .login(form)
-    .then(async (): Promise<void> => {
-      await router.push({ name: 'Dashboard' });
-    })
-    .catch((err) => {
-      const message = err?.response?.data?.message || 'Unable to login with these credentials';
+// Loading states
+const loginLoading = ref<boolean>(false);
 
-      $q.notify({ type: 'negative', message });
-      console.error(err);
-    })
-    .finally(() => (loading.value = false));
+// Form submission handlers
+const onLogin = async (): Promise<void> => {
+  try {
+    loginLoading.value = true;
+
+    await auth.login(loginForm.value);
+    await router.push({ name: 'Auth' });
+    await new Promise(() =>
+      setTimeout(() => {
+        loginForm.value = {
+          email: '',
+          password: '',
+        };
+      }, 1000),
+    );
+  } finally {
+    loginLoading.value = false;
+  }
 };
 </script>

@@ -1,177 +1,30 @@
 // app global css in SCSS form
-@import 'tailwind.css';
 
-body {
-  background: linear-gradient(
-    270deg,
-    #e9f4f7 /* soft cyan */,
-    #f3fff8 /* soft green */,
-    #f8f6f6 /* pure white */,
-    #f0f4f8 /* light slate-ish */
-  );
-  background-size: 600% 600%;
-  animation: gradientShift 20s ease infinite;
+/* Custom styles for better mobile experience */
+.q-field--outlined .q-field__control {
+  border-radius: 12px;
 }
 
-@keyframes gradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+.q-btn {
+  border-radius: 12px;
 }
 
-.layout-with-bg {
-  position: relative;
-  overflow: hidden;
+/* Smooth transitions */
+.q-btn,
+.q-input,
+.q-select {
+  transition: all 0.2s ease-in-out;
 }
 
-.animated-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 200%;
-  height: 200%;
-  background: url('/bg.svg') no-repeat center center;
-  background-size: cover;
-  animation: drift 60s linear infinite;
-  opacity: 0.03; // Keep it subtle
-  z-index: -1;
-  pointer-events: none; // Prevent interaction blocking
+/* Focus states */
+.q-field--focused .q-field__control {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
 
-@keyframes drift {
-  0% {
-    transform: translate(0%, 0%);
-  }
-  50% {
-    transform: translate(-20%, -10%);
-  }
-  100% {
-    transform: translate(0%, 0%);
-  }
+.bg-gradient-blue {
+  background: linear-gradient(to right, #1383cb 0%, #166cb7 100%);
 }
 
-.scanner-container {
-  $mask-padding: 1.5rem;
-  $border-weight: 4px;
-  background-color: white;
-
-  position: relative;
-  overflow: hidden;
-
-  .scanner-overlay {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 1;
-
-    // Overlay with a rectangular transparent "cut-out"
-    &::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-color: rgba(0, 0, 0, 0.5);
-      -webkit-mask:
-        linear-gradient(#000 0 0) content-box,
-        linear-gradient(#000 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      padding: $mask-padding; // adjust this to size the clear area
-    }
-  }
-
-  .scanner-frame {
-    position: absolute;
-    inset: calc($mask-padding - ($border-weight / 2));
-    z-index: 2;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-
-    &::before,
-    &::after {
-      content: '';
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      border: $border-weight solid white;
-    }
-
-    &::before {
-      top: 0;
-      left: 0;
-      border-right: none;
-      border-bottom: none;
-    }
-
-    &::after {
-      top: 0;
-      right: 0;
-      border-left: none;
-      border-bottom: none;
-    }
-
-    .bottom-left,
-    .bottom-right {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      border: $border-weight solid white;
-      bottom: 0;
-    }
-
-    .bottom-left {
-      left: 0;
-      border-right: none;
-      border-top: none;
-    }
-
-    .bottom-right {
-      right: 0;
-      border-left: none;
-      border-top: none;
-    }
-
-    span {
-      background-color: rgba(0, 0, 0, 0.5);
-      color: white;
-      margin: 0 2rem;
-      padding: 0.4rem 0.8rem;
-      border-radius: 6px;
-      font-size: 1rem;
-    }
-  }
-}
-
-.wave-emoji {
-  display: inline-block;
-  animation: wave 1.5s ease-in-out infinite;
-}
-
-@keyframes wave {
-  0% {
-    transform: rotate(0deg);
-  }
-  20% {
-    transform: rotate(-15deg);
-  }
-  40% {
-    transform: rotate(15deg);
-  }
-  60% {
-    transform: rotate(-10deg);
-  }
-  80% {
-    transform: rotate(5deg);
-  }
-  100% {
-    transform: rotate(0deg);
-  }
+.bg-gradient-purplish {
+  background: linear-gradient(to right, #2563eb, #4f46e5);
 }

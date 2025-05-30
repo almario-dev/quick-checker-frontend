@@ -17,8 +17,6 @@ node_modules
 /src-capacitor/www
 /src-capacitor/node_modules
 
-**/release-key.jks
-
 # Log files
 npm-debug.log*
 yarn-debug.log*
@@ -31,5 +29,5 @@ yarn-error.log*
 *.njsproj
 *.sln
 
-# .env files
-.env.*
+# local .env files
+.env.local*

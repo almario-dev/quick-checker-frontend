@@ -1,6 +1,7 @@
 import { defineBoot } from '#q-app/wrappers';
-import axios, { type AxiosInstance } from 'axios';
-import { useAuthStore } from 'src/stores/auth-store';
+import type { AxiosInstance } from 'axios';
+import axios from 'axios';
+import { useAuthStore } from 'src/stores/auth';
 
 declare module 'vue' {
   interface ComponentCustomProperties {
@@ -9,41 +10,82 @@ declare module 'vue' {
   }
 }
 
-// Be careful when using SSR for cross-request state pollution
-// due to creating a Singleton instance here;
-// If any client changes this (global) instance, it might be a
-// good idea to move this instance creation inside of the
-// "export default () => {}" function below (which runs individually
-// for each client)
-const api = axios.create({ baseURL: (import.meta.env.VITE_API ?? 'http://localhost') + '/api' });
+// Extend Axios config
+// declare module 'axios' {
+//   export interface AxiosRequestConfig {
+//     mode?: 'renew' | 'default' | 'debounce';
+//   }
+// }
+
+const api = axios.create({
+  baseURL: (import.meta.env.VITE_HOST ?? 'http://localhost') + '/api',
+  withCredentials: true,
+  withXSRFToken: true,
+});
 
 export default defineBoot(({ app }) => {
-  // for use inside Vue files (Options API) through this.$axios and this.$api
-
-  api.defaults.withCredentials = true;
-  api.defaults.withXSRFToken = true;
-
+  /*eslint-disable*/
   app.config.globalProperties.$axios = axios;
-  // ^ ^ ^ this will allow you to use this.$axios (for Vue Options API form)
-  //       so you won't necessarily have to import axios in each vue file
-
   app.config.globalProperties.$api = api;
-  // ^ ^ ^ this will allow you to use this.$api (for Vue Options API form)
-  //       so you can easily perform requests against your app's API
+
+  // const getKey = (config: InternalAxiosRequestConfig<any>) => {
+  //   let url = config.url || '';
+  //   url = url.split('?')[0]?.replace(/^\//, '')?.toLowerCase() ?? '';
+  //   return `${config.method}:${url}`;
+  // };
+
+  // const abortController = useAbortController();
 
   api.interceptors.request.use(
     (config) => {
-      const authStore = useAuthStore();
+      // const mode = config.mode;
+      // const key = getKey(config);
 
-      // sanctum authentication (SPA)
-      if (authStore.getToken) {
-        config.headers.Authorization = `Bearer ${authStore.getToken}`;
+      // console.log('mode detected', config);
+
+      // if (mode === 'renew') {
+      //   const existing = abortController.get(key);
+
+      //   // abort previous request
+      //   if (existing) abortController.abort(key);
+
+      //   // create new controller
+      //   const { signal } = abortController.create(key);
+      //   config.signal = signal;
+      // } else if (mode === 'debounce') {
+      //   const existing = abortController.get(key);
+      //   if (existing) {
+      //     return Promise.reject(
+      //       new axios.Cancel(`Debounced: A previous request for "${key}" is still pending.`),
+      //     );
+      //   }
+
+      //   const { signal } = abortController.create(key);
+      //   config.signal = signal;
+      // }
+
+      const auth = useAuthStore();
+      const token = auth.getToken;
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
       }
 
       return config;
     },
+    (error) => Promise.reject(error),
+  );
+
+  api.interceptors.response.use(
+    (response) => {
+      // const key = getKey(response.config);
+      // abortController.remove(key);
+      return response;
+    },
     (error) => {
-      // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+      // if (error.config) {
+      //   const key = getKey(error.config);
+      //   abortController.remove(key);
+      // }
       return Promise.reject(error);
     },
   );

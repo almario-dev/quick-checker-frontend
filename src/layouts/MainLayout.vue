@@ -1,182 +1,102 @@
 <template>
-  <q-layout view="lHh LpR fFf" class="text-blue-grey-10 layout-with-bg">
-    <div class="animated-bg"></div>
-
-    <q-header reveal :reveal-offset="1" class="bg-transparent">
-      <q-toolbar class="flex items-center">
+  <q-layout view="lHh Lpr lFf">
+    <q-header elevated>
+      <q-toolbar>
         <q-btn
-          v-if="pageTitle !== 'Dashboard'"
-          icon="arrow_back"
+          flat
           dense
           round
-          flat
-          color="grey-7"
-          @click="back"
+          icon="menu"
+          aria-label="Menu"
+          @click="toggleLeftDrawer"
         />
-        <Title v-if="pageTitle !== 'Dashboard'" :title="pageTitle" class="grow" />
-        <q-btn icon="more_vert" text-color="grey-8" round flat class="q-ml-auto">
-          <q-menu>
-            <q-list style="min-width: 100px">
-              <q-item clickable v-close-popup @click="logout">
-                <q-item-section>Logout</q-item-section>
-              </q-item>
-            </q-list>
-          </q-menu>
-        </q-btn>
+
+        <q-toolbar-title>
+          Quasar App
+        </q-toolbar-title>
+
+        <div>Quasar v{{ $q.version }}</div>
       </q-toolbar>
     </q-header>
 
+    <q-drawer
+      v-model="leftDrawerOpen"
+      show-if-above
+      bordered
+    >
+      <q-list>
+        <q-item-label
+          header
+        >
+          Essential Links
+        </q-item-label>
+
+        <EssentialLink
+          v-for="link in linksList"
+          :key="link.title"
+          v-bind="link"
+        />
+      </q-list>
+    </q-drawer>
+
     <q-page-container>
-      <q-pull-to-refresh @refresh="refresh">
-        <router-view />
-      </q-pull-to-refresh>
+      <router-view />
     </q-page-container>
-
-    <q-footer class="bg-white text-dark" elevated>
-      <div class="flex justify-between bg-white text-primary h-[3.5rem] bottom-nav">
-        <q-btn
-          exact
-          :color="route.name === 'Dashboard' ? 'blue-grey-5' : 'primary'"
-          :to="{ name: 'Dashboard' }"
-          flat
-          icon="home"
-          class="flex-1"
-          square
-          :loading="disabled"
-          :disable="disabled"
-        />
-        <q-btn
-          exact
-          :to="{ name: 'Recents' }"
-          :color="route.name === 'Recents' ? 'blue-grey-5' : 'primary'"
-          flat
-          icon="manage_search"
-          class="flex-1"
-          square
-          :loading="disabled"
-          :disable="disabled"
-        />
-
-        <q-btn
-          icon="document_scanner"
-          class="shadow-9 scan-btn"
-          glossy
-          color="secondary"
-          text-color="white"
-          round
-          @click="app.scanNow"
-          :disable="disabled"
-        />
-
-        <q-btn
-          exact
-          :to="{ name: 'Profile' }"
-          :color="route.name === 'Profile' ? 'blue-grey-5' : 'primary'"
-          flat
-          icon="person"
-          class="flex-1"
-          square
-          :loading="disabled"
-          :disable="disabled"
-        />
-        <q-btn
-          exact
-          :to="{ name: 'Settings' }"
-          :color="route.name === 'Settings' ? 'blue-grey-5' : 'primary'"
-          flat
-          icon="settings"
-          class="flex-1"
-          square
-          :loading="disabled"
-          :disable="disabled"
-        />
-      </div>
-    </q-footer>
   </q-layout>
 </template>
 
 <script setup lang="ts">
-import { useQuasar } from 'quasar';
-import { skip } from 'src/assets/utils';
-import { Title } from 'src/components';
-import { useAlertStore } from 'src/stores/alert-store';
-import { useAnswerKeyStore } from 'src/stores/answer-key-store';
-import { useAnswerSheetStore } from 'src/stores/answer-sheet';
-import { useAppStore } from 'src/stores/app';
-import { useAuthStore } from 'src/stores/auth-store';
-import { useSubjectStore } from 'src/stores/subject-store';
-import { useUserStore } from 'src/stores/user-store';
-import { computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { ref } from 'vue';
+import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue';
 
-const $q = useQuasar();
-const app = useAppStore();
-const authStore = useAuthStore();
-const userStore = useUserStore();
-const alertStore = useAlertStore();
-const answerSheetStore = useAnswerSheetStore();
-const answerKeyStore = useAnswerKeyStore();
-const subjectStore = useSubjectStore();
-
-const router = useRouter();
-const route = useRoute();
-
-const disabled = computed(() => !userStore.isAuthenticated);
-
-const pageTitle = computed(() => {
-  return typeof route.name === 'string' ? route.name : String(route.name ?? '');
-});
-
-const logout = (): void => {
-  $q.dialog({
-    title: 'Logout?',
-    message: 'You will be redirected back to the login page',
-    cancel: true,
-  }).onOk(() => {
-    authStore
-      .logout()
-      .then(() => {
-        subjectStore.resetState();
-        answerSheetStore.resetState();
-        answerKeyStore.resetState();
-
-        router.push({ name: 'Guest' }).catch(skip);
-      })
-      .catch(() => {
-        alertStore.Stack({ type: 'negative', message: 'Fail to logout' });
-      });
-  });
-};
-
-const refresh = async (done: () => void): Promise<void> => {
-  try {
-    subjectStore.cancelAll();
-    answerSheetStore.cancelAll();
-
-    await authStore.refresh();
-    await Promise.all([subjectStore.init(), answerKeyStore.fetch(), answerSheetStore.init()]);
-    done();
-  } catch (error) {
-    console.error('Task has failed: ', error);
+const linksList: EssentialLinkProps[] = [
+  {
+    title: 'Docs',
+    caption: 'quasar.dev',
+    icon: 'school',
+    link: 'https://quasar.dev'
+  },
+  {
+    title: 'Github',
+    caption: 'github.com/quasarframework',
+    icon: 'code',
+    link: 'https://github.com/quasarframework'
+  },
+  {
+    title: 'Discord Chat Channel',
+    caption: 'chat.quasar.dev',
+    icon: 'chat',
+    link: 'https://chat.quasar.dev'
+  },
+  {
+    title: 'Forum',
+    caption: 'forum.quasar.dev',
+    icon: 'record_voice_over',
+    link: 'https://forum.quasar.dev'
+  },
+  {
+    title: 'Twitter',
+    caption: '@quasarframework',
+    icon: 'rss_feed',
+    link: 'https://twitter.quasar.dev'
+  },
+  {
+    title: 'Facebook',
+    caption: '@QuasarFramework',
+    icon: 'public',
+    link: 'https://facebook.quasar.dev'
+  },
+  {
+    title: 'Quasar Awesome',
+    caption: 'Community Quasar projects',
+    icon: 'favorite',
+    link: 'https://awesome.quasar.dev'
   }
-};
+];
 
-const back = (): void => router.go(-1);
-</script>
+const leftDrawerOpen = ref(false);
 
-<style lang="scss">
-.bottom-nav {
-  button:not(.scan-btn) {
-    height: 100%;
-  }
-
-  .scan-btn {
-    --size: 4.5rem;
-    z-index: 10;
-    font-size: 1rem;
-    margin-top: -2.25rem;
-    width: var(--size);
-    height: var(--size);
-  }
+function toggleLeftDrawer () {
+  leftDrawerOpen.value = !leftDrawerOpen.value;
 }
-</style>
+</script>

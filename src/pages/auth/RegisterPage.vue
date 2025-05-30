@@ -1,132 +1,190 @@
 <template>
-  <q-page class="p-6 column items-stretch justify-center">
-    <q-form class="q-gutter-y-sm" autofocus @submit.prevent="submit">
-      <div class="text-center column mb-8 items-center justify-center">
-        <AppLogo size="md" />
-        <span class="text-[1.5rem] font-[600] text-primary">Quick Checker</span>
-        <span class="text-[1rem] text-blue-grey-8 mt-2">Register</span>
+  <div class="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+    <div class="flex items-center justify-center mb-6">
+      <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+        <q-icon name="person_add" class="text-purple-600 text-lg" />
       </div>
-      <q-input v-model="form.name" label="Name" outlined lazy-rules :rules="rules.name" />
-      <q-input
-        v-model="form.email"
-        label="Email Address"
-        outlined
-        lazy-rules
-        :rules="rules.email"
-      />
-      <q-input
-        v-model="form.password"
-        label="Password"
-        :type="showPassword ? 'text' : 'password'"
-        outlined
-        lazy-rules
-        :rules="rules.password"
-      >
-        <template v-if="form.password || form.password_confirmation" v-slot:append>
-          <q-btn
-            :icon="showPassword ? 'visibility_off' : 'visibility'"
-            dense
-            flat
-            color="grey-6"
-            @click="showPassword = !showPassword"
+      <div class="text-xl font-semibold text-gray-800">Create Account</div>
+    </div>
+
+    <q-form @submit.prevent="onRegister" class="space-y-4">
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+          <q-input
+            v-model="registerForm.firstname"
+            placeholder="John"
+            outlined
+            class="w-full"
+            :rules="[(val) => !!val || 'First name is required']"
           />
-        </template>
-      </q-input>
-      <q-input
-        v-model="form.password_confirmation"
-        label="Confirm Password"
-        :type="showPassword ? 'text' : 'password'"
-        outlined
-        lazy-rules
-        :rules="rules.password_confirmation"
-      >
-        <template v-if="form.password || form.password_confirmation" v-slot:append>
-          <q-btn
-            :icon="showPassword ? 'visibility_off' : 'visibility'"
-            dense
-            flat
-            color="grey-6"
-            @click="showPassword = !showPassword"
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+          <q-input
+            v-model="registerForm.lastname"
+            placeholder="Doe"
+            outlined
+            class="w-full"
+            :rules="[(val) => !!val || 'Last name is required']"
           />
-        </template>
-      </q-input>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+        <q-input
+          v-model="registerForm.email"
+          type="email"
+          placeholder="teacher@school.edu"
+          outlined
+          class="w-full"
+          :rules="[(val) => !!val || 'Email is required']"
+        >
+          <template v-slot:prepend>
+            <q-icon name="email" class="text-gray-400" />
+          </template>
+        </q-input>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+        <q-input
+          v-model="registerForm.password"
+          :type="showRegisterPassword ? 'text' : 'password'"
+          placeholder="Create a strong password"
+          outlined
+          class="w-full"
+          :rules="[
+            (val) => !!val || 'Password is required',
+            (val) => val.length >= 8 || 'Password must be at least 8 characters',
+          ]"
+        >
+          <template v-slot:prepend>
+            <q-icon name="lock" class="text-gray-400" />
+          </template>
+          <template v-slot:append>
+            <q-icon
+              :name="showRegisterPassword ? 'visibility_off' : 'visibility'"
+              class="cursor-pointer text-gray-400"
+              @click="showRegisterPassword = !showRegisterPassword"
+            />
+          </template>
+        </q-input>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+        <q-input
+          v-model="registerForm.password_confirmation"
+          :type="showConfirmPassword ? 'text' : 'password'"
+          placeholder="Confirm your password"
+          outlined
+          class="w-full"
+          :rules="[
+            (val) => !!val || 'Please confirm your password',
+            (val) => val === registerForm.password || 'Passwords do not match',
+          ]"
+        >
+          <template v-slot:prepend>
+            <q-icon name="lock" class="text-gray-400" />
+          </template>
+          <template v-slot:append>
+            <q-icon
+              :name="showConfirmPassword ? 'visibility_off' : 'visibility'"
+              class="cursor-pointer text-gray-400"
+              @click="showConfirmPassword = !showConfirmPassword"
+            />
+          </template>
+        </q-input>
+      </div>
+
+      <div class="pt-2">
+        <q-checkbox v-model="registerForm.terms" class="text-sm text-gray-600">
+          <span class="ml-2">
+            I agree to the
+            <a href="#" class="text-blue-600 hover:text-blue-800 font-medium">Terms of Service</a>
+            and
+            <a href="#" class="text-blue-600 hover:text-blue-800 font-medium">Privacy Policy</a>
+          </span>
+        </q-checkbox>
+      </div>
 
       <q-btn
         type="submit"
-        class="full-width"
-        padding="md"
-        label="Create account"
+        label="Create Account"
         color="primary"
-        :loading="isSubmitting"
-        :disable="isSubmitting"
+        class="full-width q-py-md rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+        no-caps
+        :loading="registerLoading"
+        :disable="registerLoading || !registerForm.terms"
       />
     </q-form>
 
-    <div class="text-center q-mt-lg">
-      Already have an account?
-      <br />
-      <q-btn label="Login here" color="secondary" no-caps dense flat :to="{ name: 'Login' }" />
+    <div class="flex items-center text-center mt-6">
+      <span class="text-sm text-gray-600">Already have an account?</span>
+      <q-btn
+        :to="{ name: 'Login' }"
+        label="Login Here"
+        flat
+        no-caps
+        class="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors ml-1"
+        unelevated
+        padding=""
+        color="primary"
+      />
     </div>
-  </q-page>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { useQuasar } from 'quasar';
-import { skip } from 'src/assets/utils';
-import AppLogo from 'src/components/AppLogo.vue';
-import type { IUserRegistration } from 'src/composables/interfaces/IUser';
-import { createRules } from 'src/composables/useRules';
-import { useAuthStore } from 'src/stores/auth-store';
-import { computed, reactive, ref } from 'vue';
+import { ref } from 'vue';
+import type { RegisterForm } from 'src/types/auth';
+import { useAuthStore } from 'src/stores/auth';
 import { useRouter } from 'vue-router';
 
-const $q = useQuasar();
+const auth = useAuthStore();
 const router = useRouter();
-const authStore = useAuthStore();
-const isSubmitting = ref<boolean>(false);
-const showPassword = ref<boolean>(false);
 
-const form = reactive<IUserRegistration>({
-  name: '',
+// Register form data
+const registerForm = ref<RegisterForm>({
+  firstname: '',
+  lastname: '',
   email: '',
   password: '',
   password_confirmation: '',
+  terms: false,
 });
 
-const rules = computed(() => ({
-  name: createRules({ required: true }),
-  email: createRules({ required: true, email: true }),
-  password: createRules({ required: true, min: '6' }),
-  password_confirmation: createRules({
-    required: true,
-    custom: () => form.password === form.password_confirmation || 'Password do not match',
-  }),
-}));
+const showRegisterPassword = ref<boolean>(false);
+const showConfirmPassword = ref<boolean>(false);
 
-const resetForm = (): void => {
-  form.name = '';
-  form.email = '';
-  form.password = '';
-  form.password_confirmation = '';
+const registerLoading = ref<boolean>(false);
+
+const resetForm = () => {
+  registerForm.value = {
+    firstname: '',
+    lastname: '',
+    email: '',
+    password: '',
+    password_confirmation: '',
+    terms: false,
+  };
 };
 
-const submit = (): void => {
-  isSubmitting.value = true;
+const onRegister = async (): Promise<void> => {
+  if (!registerForm.value.terms) {
+    return;
+  }
 
-  authStore
-    .register(form)
-    .then(() => {
-      router.push({ name: 'Dashboard' }).catch(skip);
+  registerLoading.value = true;
 
-      $q.notify({ type: 'positive', message: 'You have successfully created an account!' });
-      resetForm();
-    })
-    .catch((err) => {
-      const message = err?.response?.data?.message || 'Registration failed';
-
-      $q.notify({ type: 'negative', message });
-      console.error(err);
-    })
-    .finally(() => (isSubmitting.value = false));
+  try {
+    await auth.register(registerForm.value);
+    await router.push({ name: 'Auth' });
+    await new Promise(() => setTimeout(resetForm, 1000));
+  } finally {
+    registerLoading.value = false;
+  }
 };
 </script>

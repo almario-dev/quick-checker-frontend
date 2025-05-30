@@ -1,4 +1,5 @@
 // https://github.com/michael-ciniawsky/postcss-load-config
+
 import tailwindcss from '@tailwindcss/postcss';
 import autoprefixer from 'autoprefixer';
 // import rtlcss from 'postcss-rtlcss'

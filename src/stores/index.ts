@@ -1,7 +1,6 @@
 import { defineStore } from '#q-app/wrappers';
 import { createPinia } from 'pinia';
-import type { PluginOptions } from 'pinia-plugin-persistedstate';
-import { createPersistedState } from 'pinia-plugin-persistedstate';
+import { createPersistedState, type PluginOptions } from 'pinia-plugin-persistedstate';
 import pkg from '../../package.json';
 
 /*
@@ -35,6 +34,9 @@ export default defineStore((/* { ssrContext } */) => {
   // You can add Pinia plugins here
   // pinia.use(SomePiniaPlugin)
   pinia.use(createPersistedState(options));
+
+  // You can add Pinia plugins here
+  // pinia.use(SomePiniaPlugin)
 
   return pinia;
 });

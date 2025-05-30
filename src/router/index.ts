@@ -6,10 +6,8 @@ import {
   createWebHistory,
 } from 'vue-router';
 import routes from './routes';
-import { useAuthStore } from 'src/stores/auth-store';
-import { useUserStore } from 'src/stores/user-store';
-import type { AxiosError } from 'axios';
-import { showAlertDialog } from 'src/composables/usePlugins';
+import { useAuthStore } from 'src/stores/auth';
+import { dialog } from 'src/composables/usePopup';
 
 /*
  * If not building with SSR mode, you can
@@ -37,40 +35,51 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   });
 
-  Router.beforeEach(async (to, from, next) => {
+  Router.beforeEach(async (to) => {
     try {
-      const authStore = useAuthStore();
-      const userStore = useUserStore();
+      const auth = useAuthStore();
 
-      const hasToken: boolean = authStore.getToken !== null;
+      /**
+       * Hydrate user data (from page reload/refresh)
+       */
 
-      // after page reload/refresh
-      if (hasToken && !userStore.isAuthenticated) {
-        await authStore.refresh();
+      const hasTokenButNoUser: boolean = auth.getToken !== null && !auth.hasUser;
+
+      if (hasTokenButNoUser) {
+        await auth.refresh();
       }
 
-      if (!userStore.isAuthenticated && to.meta.requireAuth) {
-        return next({ name: 'Guest' });
+      /**
+       * Accessing auth pages from guest user
+       */
+
+      const guestGoingToAuth: boolean =
+        (to.meta.requireAuth as boolean) && (!auth.hasUser || auth.getToken === null);
+
+      if (guestGoingToAuth) {
+        return { name: 'Guest' };
       }
 
-      // accessing guest-only pages while currently signed in
-      if (to.meta.guestOnly && (userStore.isAuthenticated || hasToken)) {
-        return next({ name: 'Dashboard' });
-      }
+      /**
+       * Accessing guest pages while currently signed in
+       */
 
-      next();
-    } catch (err) {
-      if ((err as AxiosError).response?.status === 401) {
-        showAlertDialog({
-          title: 'Session expired',
-          message: 'Please log in again',
-          type: 'error',
-        });
+      const authGoingToGuest: boolean =
+        to.meta?.requireAuth == undefined && auth.hasUser && auth.getToken !== null;
 
-        return next({ name: 'Login' });
-      } else {
-        return next({ name: 'Error' });
+      if (authGoingToGuest) {
+        return { name: 'Dashboard' };
       }
+    } catch {
+      await dialog({
+        title: 'Invalid session',
+        message: 'Your session has expired or is invalid. Please log in again to continue.',
+        icon: 'error',
+        iconBg: 'bg-red-2',
+        iconClass: 'text-red-5',
+      });
+
+      return { name: 'Guest' };
     }
   });
 
